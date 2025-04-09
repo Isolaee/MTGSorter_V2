@@ -1,2 +1,41 @@
-.flake8
-.vscode
+# Ignore hidden files
+.*
+#Ignore temporary files
+*.log
+*.tmp
+
+# Virtual environment directory
+venv/
+
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+
+# pyenv
+.python-version
+
+# dotenv environment variable files
+.env
+.env.*
+
+# pytest
+.pytest_cache/
