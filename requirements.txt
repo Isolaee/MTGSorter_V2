@@ -1,4 +1,5 @@
 # VENV is done with miniconda
 
 #QA
-Flake-8-7.1.2
+Flake8-4.0.1
+Black-25.1.0
