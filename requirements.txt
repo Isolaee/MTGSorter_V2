@@ -1,5 +1,6 @@
 # VENV is done with miniconda
 
 #QA
-Flake8-4.0.1
-Black-25.1.0
+Flake8      -4.0.1
+Black       -25.1.0
+Precommit   -4.0.1
