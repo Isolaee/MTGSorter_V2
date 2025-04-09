@@ -13,5 +13,5 @@ Not so simple plan is to:
 
 ## Tools
 - Tests: pyTest/Tox
-- Coding: black/flake8/Secrets
+- Coding: black/flake8
 - Git: pre-commit/Git
