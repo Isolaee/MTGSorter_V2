@@ -26,14 +26,6 @@ class MTGdeck(Deck, ABC):
         return self.scryfallStatic
 
     @abstractmethod
-    def add_card(self, card: T) -> None:
-        """Add a card to the deck."""
-        if len(self.cards) < 60:
-            self.cards.append(card)
-        else:
-            raise ValueError("Deck already contains 60 cards.")
-
-    @abstractmethod
     def shuffle(self) -> None:
         """Shuffle the deck."""
         import random
