@@ -12,6 +12,22 @@ Not so simple plan is to:
 - New error handling
 
 ## Tools
-- Tests: pyTest/Tox
+- Tests: pyTest
 - Coding: black/flake8
 - Git: pre-commit/Git
+
+## GUI
+- JarApp (not included in Git)
+
+## Code is located in Code folder
+- App.py -> app starting point
+- DeckParser.py -> utility class for deck
+- Deck.py -> abstract base class for MTGDeck.py
+- MTGDeck.py -> abstract class for different MTGDecks. Because MTG and other TCG have different formats, the class we instantiate object from will be defied by format.
+- PlayingCard.py -> Abtract base class for MTGCard.py
+- MTGCard.py -> Card Class, that hold the datastructure of a MTG card.
+
+## Tests are located in tests folder
+
+## Diagrams are located in Schemas folder.
+- Deck & Card class diagram

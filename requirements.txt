@@ -3,4 +3,5 @@
 #QA
 # Flake8      -4.0.1
 # Black       -25.1.0
-# Precommit   -4.0.1
+# Pre-commit   -4.0.1
+# PyTest
