@@ -43,3 +43,6 @@ coverage.xml
 
 #
 tests/__pycache__/
+
+# JarApp
+JarApp/
