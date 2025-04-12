@@ -91,7 +91,7 @@ def menuControls(item):
 
 
 ### GUI
-app = gui("MTG Sorter", "800x600")
+app = gui("MTGDeckStats", "800x600")
 # Stickiness and strechiness
 app.setSticky("new")  # North, East, West
 app.setStretch("column")
@@ -112,15 +112,24 @@ app.addLabelEntry("Commander Name")
 # app.hideLabel("Commander Name")  # Hide by default
 # app.hideEntry("Commander Name")   # hide and show is not working
 
-
 ## File Entry
 app.addFileEntry("DeckUpload")
 
 # Add Load button
 app.addButton("Load", press)
 
+
+app.startPanedFrame("MainFrame")
+
+### Left window
+app.startPanedFrame("Data")
 # Deck Preview window.
 app.addListBox("DeckPreview")
 
+### Right window
+app.startPanedFrame("Graphs")
 # Graphs
 app.addCanvas("GraphCanvas")
+# # DataMenu
+# dataMenu = ["Type Search", "Mana Curve", "Permanents", "Spells", "Card Distribution"]
+# app.addMenuList("Data", dataMenu, dataMenuControls)
