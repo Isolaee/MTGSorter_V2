@@ -48,7 +48,7 @@ class DeckParser:
                     if card_name == commander_name:
                         commander = card
                 except ValueError as e:
-                    print(f"Error parsing line '{line.strip()}': {e}")
+                    print(f"Error': {e}")
                     continue
 
         if not commander:

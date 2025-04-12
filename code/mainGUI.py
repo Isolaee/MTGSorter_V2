@@ -46,7 +46,7 @@ def press(btn):
 
         # Update the DeckPreview list box
         app.clearListBox("DeckPreview", callFunction=False)
-        app.addListItem("DeckPreview", currentDeck.Allnames(), callFunction=False)
+        # app.addListItem("DeckPreview", currentDeck.name(), callFunction=False)
 
 
 def formatChanged():
@@ -99,13 +99,12 @@ fileMenus = ["Close"]
 app.addMenuList("Menu", fileMenus, menuControls)
 
 # Add widgets for format selection
-app.addLabelOptionBox(
-    "Deck Format", ["Commander", "Pioneer"], changeFunction=formatChanged
-)
+formats = ["Commander", "Pioneer"]
+app.addLabelOptionBox("Deck Format", formats, change=formatChanged)
 app.addLabelEntry("Deck Name")
 app.addLabelEntry("Commander Name")
-app.hideLabel("Commander Name")  # Hide by default
-app.hideEntry("Commander Name")
+# app.hideLabel("Commander Name")  # Hide by default
+# app.hideEntry("Commander Name")   # hide and show is not working
 
 
 ## File Entry

@@ -23,7 +23,7 @@ class EDHDeck(MTGDeck):
 
     def getName(self) -> str:
         """Return the name of the deck."""
-        return self.name + " (Commander)"
+        return self.name
 
     def getFormat(self) -> str:
         """Return the format of the deck."""
@@ -40,3 +40,16 @@ class EDHDeck(MTGDeck):
     def getCommander(self) -> MTGCard:
         """Return the commander of the deck."""
         return self.commander.toString()  # This toString() might of might not work.
+
+    def getScryfallStatic(self) -> str:
+        """Return the Scryfall static URL."""
+        return self.scryfallStatic
+
+    def shuffle(self):
+        return super().shuffle()
+
+    def draw_card(self):
+        return super().draw_card()
+
+    def __str__(self):
+        return self.getName()
