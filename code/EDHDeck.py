@@ -1,5 +1,6 @@
 from MTGDeck import MTGDeck
 from MTGCard import MTGCard
+from collections import Counter
 
 
 class EDHDeck(MTGDeck):
@@ -55,5 +56,12 @@ class EDHDeck(MTGDeck):
         return self.getName()
 
     def getAllCardNames(self) -> list:
-        """Return a list of all card names in the deck."""
-        return [card.getName() for card in self.cards]
+        return super().getAllCardNames()
+
+    def getCardNamesAndAmounts(self):
+        """Return a dictionary of card names and their amounts."""
+        card_counts = Counter(card.getName() for card in self.cards)
+        return dict(card_counts)
+
+    def getDeckData(self):
+        return super().getDeckData()

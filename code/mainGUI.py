@@ -46,7 +46,13 @@ def press(btn):
 
         # Update the DeckPreview list box
         app.clearListBox("DeckPreview", callFunction=False)
-        app.addListItem("DeckPreview", currentDeck.getAllCardNames())
+        app.addListItem("DeckPreview", unPackCardNames())
+
+
+def unPackCardNames():
+    deck = currentDeck.getCardNamesAndAmounts()
+    for card_name, amount in deck.items():
+        app.addListItem("DeckPreview", f"{amount}x {card_name}")
 
 
 def formatChanged():

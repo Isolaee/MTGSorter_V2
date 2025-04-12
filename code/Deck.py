@@ -20,3 +20,8 @@ class Deck(ABC):
     def getAllCardNames(self) -> list:
         """Return a list of all card names in the deck."""
         pass
+
+    @abstractmethod
+    def getCardNamesAndAmounts(self) -> dict:
+        """Return a dictionary of card names and their amounts."""
+        pass

@@ -39,3 +39,20 @@ class MTGDeck(Deck, ABC):
             return self.cards.pop(0)
         else:
             raise ValueError("The deck is empty.")
+
+    def getAllCardNames(self):
+        """Return a list of all card names in the deck."""
+        return [card.getName() for card in self.cards]
+
+    @abstractmethod
+    def getDeckData(self) -> dict:
+        """Return the deck data as a dictionary. This data is meant to be used for graphical representation."""
+        deck_data = {
+            "name": self.getName(),
+            "format": self.getFormat(),
+            "formatRules": self.getFormatRules(),
+            "commander": self.getCommander(),
+            "cards": self.getAllCardNames(),
+            "CMCs": [card.getCMC() for card in self.cards],
+        }
+        return deck_data
