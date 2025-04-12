@@ -15,3 +15,8 @@ class Deck(ABC):
     def __str__(self) -> str:
         """Return a string representation of the deck."""
         pass
+
+    @abstractmethod
+    def getAllCardNames(self) -> list:
+        """Return a list of all card names in the deck."""
+        pass

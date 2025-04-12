@@ -53,3 +53,7 @@ class EDHDeck(MTGDeck):
 
     def __str__(self):
         return self.getName()
+
+    def getAllCardNames(self) -> list:
+        """Return a list of all card names in the deck."""
+        return [card.getName() for card in self.cards]

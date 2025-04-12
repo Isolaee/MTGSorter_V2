@@ -46,7 +46,7 @@ def press(btn):
 
         # Update the DeckPreview list box
         app.clearListBox("DeckPreview", callFunction=False)
-        # app.addListItem("DeckPreview", currentDeck.name(), callFunction=False)
+        app.addListItem("DeckPreview", currentDeck.getAllCardNames())
 
 
 def formatChanged():
