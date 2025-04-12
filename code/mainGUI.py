@@ -1,6 +1,7 @@
 # Import GUI (JarAPp)
 from appJar import gui
 from DeckParser import DeckParser
+import re
 
 # import filefun
 # import matplotlib.pyplot as plt
@@ -9,15 +10,15 @@ from DeckParser import DeckParser
 # from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from matplotlib.figure import Figure
 
+regex_engine = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
+
 
 def press(btn):
     """
-    Load Button function
+    Handle button presses.
 
     Args:
-        btn (str): Button title
-    Returns:
-        Nothing.
+        btn (str): The button that was pressed.
     """
     global currentDeck
 
@@ -28,9 +29,9 @@ def press(btn):
         # Get the selected format from the drop-down menu
         format = app.getOptionBox("Deck Format")
 
-        # Get deck name from the entry field
-        deck_name = app.getEntry("Deck Name")
-        if deck_name is None:
+        # Get the deck name from the entry field
+        deck_name = app.getEntry(name="Deck Name")
+        if not deck_name:
             deck_name = "My Deck"
 
         # Get the commander name if the format is Commander
@@ -38,8 +39,10 @@ def press(btn):
         if format == "Commander":
             commander_name = app.getEntry("Commander Name")
 
-        # Pass the format and commander name to the DeckParser
-        currentDeck = DeckParser.CreateDeck(file_path, deck_name, format, commander_name)
+        # Pass the regex engine to the DeckParser
+        currentDeck = DeckParser.CreateDeck(
+            file_path, deck_name, format, commander_name, regex_engine
+        )
 
         # Update the DeckPreview list box
         app.clearListBox("DeckPreview", callFunction=False)
@@ -60,12 +63,10 @@ def formatChanged():
 # Start GUI func
 def startGUI():
     """
-    Starts GUI (JarApp)
+    Start the GUI application.
 
     Args:
-        None
-    returns:
-        Nothing.
+        regex_engine: The compiled regex engine to be used in the app.
     """
     app.go()
 
@@ -84,7 +85,7 @@ def menuControls(item):
 
 
 ### GUI
-app = gui("MTGDeckStats", "800x600")
+app = gui("MTG Sorter", "800x600")
 # Stickiness and strechiness
 app.setSticky("new")  # North, East, West
 app.setStretch("column")
@@ -101,6 +102,7 @@ app.addMenuList("Menu", fileMenus, menuControls)
 app.addLabelOptionBox(
     "Deck Format", ["Commander", "Pioneer"], changeFunction=formatChanged
 )
+app.addLabelEntry("Deck Name")
 app.addLabelEntry("Commander Name")
 app.hideLabel("Commander Name")  # Hide by default
 app.hideEntry("Commander Name")

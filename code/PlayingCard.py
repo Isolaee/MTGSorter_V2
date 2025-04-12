@@ -14,11 +14,6 @@ class PlayingCard(ABC):
         self.legalities = legalities
 
     @abstractmethod
-    def __str__(self) -> str:
-        """Return a string representation of the card."""
-        pass
-
-    @abstractmethod
     def __eq__(self, other) -> bool:
         """Check if two cards are equal."""
         pass

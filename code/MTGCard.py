@@ -104,3 +104,6 @@ class MTGCard(PlayingCard):
     def __str__(self) -> str:
         """Return a string representation of the card."""
         return self.getName()
+
+    def __eq__(self, other):
+        return super().__eq__(other)

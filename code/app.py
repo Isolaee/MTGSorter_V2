@@ -1,14 +1,12 @@
-# MTG sorter project (V2) with sryfall API data.
+# MTG sorter project (V2) with scryfall API data.
 
 # By Eero Isola
 
 ###########################
 
 # Imports
-### Imports
-# GUI
 import mainGUI
 
-# Start GUI
-# There should not be anymore code after GUI start!
+
+# Start the GUI application with the regex engine
 mainGUI.startGUI()
