@@ -1,5 +1,6 @@
 # Import GUI (JarAPp)
 from appJar import gui
+from DeckParser import DeckParser
 
 # import filefun
 # import matplotlib.pyplot as plt
@@ -14,10 +15,46 @@ def press(btn):
     Load Button function
 
     Args:
-        Button title
+        btn (str): Button title
     Returns:
         Nothing.
     """
+    global currentDeck
+
+    if btn == "Load":
+        # Get the file path from the file entry widget
+        file_path = app.getEntry("DeckUpload")
+
+        # Get the selected format from the drop-down menu
+        format = app.getOptionBox("Deck Format")
+
+        # Get deck name from the entry field
+        deck_name = app.getEntry("Deck Name")
+        if deck_name is None:
+            deck_name = "My Deck"
+
+        # Get the commander name if the format is Commander
+        commander_name = None
+        if format == "Commander":
+            commander_name = app.getEntry("Commander Name")
+
+        # Pass the format and commander name to the DeckParser
+        currentDeck = DeckParser.CreateDeck(file_path, deck_name, format, commander_name)
+
+        # Update the DeckPreview list box
+        app.clearListBox("DeckPreview", callFunction=False)
+        app.addListItem("DeckPreview", currentDeck.Allnames(), callFunction=False)
+
+
+def formatChanged():
+    """Show or hide the Commander Name field based on the selected format."""
+    format = app.getOptionBox("Deck Format")
+    if format == "Commander":
+        app.showLabel("Commander Name")
+        app.showEntry("Commander Name")
+    else:
+        app.hideLabel("Commander Name")
+        app.hideEntry("Commander Name")
 
 
 # Start GUI func
@@ -59,6 +96,14 @@ app.setFont(20)
 # Menu
 fileMenus = ["Close"]
 app.addMenuList("Menu", fileMenus, menuControls)
+
+# Add widgets for format selection
+app.addLabelOptionBox(
+    "Deck Format", ["Commander", "Pioneer"], changeFunction=formatChanged
+)
+app.addLabelEntry("Commander Name")
+app.hideLabel("Commander Name")  # Hide by default
+app.hideEntry("Commander Name")
 
 
 ## File Entry

@@ -6,7 +6,7 @@ class DeckParser:
     """Utility class for parsing deck lists."""
 
     @staticmethod
-    def parse(file_path: str, deck_name: str, commander_name: str) -> EDHDeck:
+    def CreateDeck(file_path: str, deck_name: str, commander_name: str) -> EDHDeck:
         cards = []
         commander = None
 

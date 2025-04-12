@@ -15,3 +15,8 @@ class Deck(ABC):
     def __str__(self) -> str:
         """Return a string representation of the deck."""
         pass
+
+    @abstractmethod
+    def CreateDeck(self, filename: str):
+        """Create a deck from a file."""
+        pass

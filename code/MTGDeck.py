@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 T = TypeVar("T", bound=PlayingCard)  # T must be a subclass of PlayingCard
 
 
-class MTGdeck(Deck, ABC):
+class MTGDeck(Deck, ABC):
     """Class representing a deck of Magic: The Gathering cards."""
 
     def __init__(self, name: str, scryfallStatic: str) -> None:
