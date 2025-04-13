@@ -8,7 +8,12 @@ class DeckParser:
 
     @staticmethod
     def CreateDeck(
-        file_path: str, deck_name: str, format: str, commander_name: str, regex_engine
+        file_path: str,
+        deck_name: str,
+        format: str,
+        commander_name: str,
+        regex_engine_card,
+        regex_engine_type,
     ):
         cards = []
         ScryData = "Data\\ScryfallCardData13_04_2025.json"
@@ -24,7 +29,7 @@ class DeckParser:
 
             for line in file:
                 try:
-                    match = regex_engine.search(line)
+                    match = regex_engine_card.search(line)
                     if not match:
                         raise ValueError(f"Invalid line format: {line.strip()}")
                     card_name = match.group("name").strip()
@@ -41,21 +46,27 @@ class DeckParser:
                             f"Card '{card_name}' not found in Scryfall data."
                         )
 
+                    creature_type_match = regex_engine_type.search(card_data["type_line"])
+                    if creature_type_match:
+                        cardType = creature_type_match.group("CardType")
+                        creatureType = creature_type_match.group("CreatureType")
+
                     card = MTGCard(
                         name=card_name,
-                        manacost=card_data.get("manacost"),
+                        manacost=card_data.get("mana_cost"),
                         cmc=card_data.get("cmc"),
                         colors=card_data.get("colors"),
                         power=card_data.get("power"),
                         toughness=card_data.get("toughness"),
-                        oracleText=card_data.get("oracleText"),
+                        oracleText=card_data.get("oracle_text"),
                         loyalty=card_data.get("loyalty"),
-                        typeline=card_data.get("typeline"),
-                        cardFaces=card_data.get("cardFaces"),
-                        allParts=card_data.get("allParts"),
+                        typeline=creatureType,
+                        cardType=cardType,
+                        cardFaces=card_data.get("card_faces"),
+                        allParts=card_data.get("all_parts"),
                         layout=card_data.get("layout"),
                         artist=card_data.get("artist"),
-                        scryfallid=card_data.get("scryfallid"),
+                        scryfallid=card_data.get("id"),
                         legalities="Commander",
                     )
 

@@ -16,6 +16,7 @@ class MTGCard(PlayingCard):
         oracleText: str,
         loyalty: str,
         typeline: str,
+        cardType: str,
         cardFaces: str,
         allParts: str,
         layout: str,
@@ -34,6 +35,7 @@ class MTGCard(PlayingCard):
         self.oracleText = oracleText
         self.loyalty = loyalty
         self.typeline = typeline
+        self.cardType = cardType
         self.cardFaces = cardFaces
         self.allParts = allParts
         self.layout = layout
@@ -76,6 +78,10 @@ class MTGCard(PlayingCard):
     def getTypeLine(self) -> str:
         """Return the type line of the card."""
         return self.typeline
+
+    def getCardType(self) -> str:
+        """Return the card type of the card."""
+        return self.cardType
 
     def getCardFaces(self) -> str:
         """Return the card faces of the card."""

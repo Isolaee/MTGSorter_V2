@@ -13,7 +13,8 @@ from matplotlib.ticker import MaxNLocator
 # from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from matplotlib.figure import Figure
 
-regex_engine = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
+regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
+regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
 
 
 def press(btn):
@@ -44,7 +45,12 @@ def press(btn):
 
         # Pass the regex engine to the DeckParser
         currentDeck = DeckParser.CreateDeck(
-            file_path, deck_name, format, commander_name, regex_engine
+            file_path,
+            deck_name,
+            format,
+            commander_name,
+            regex_engine_card,
+            regex_engine_type,
         )
 
         # Update the DeckPreview list box
@@ -88,7 +94,8 @@ def dataMenuControls(item):
     elif item == "Spells":
         pass  # Implement spells functionality here
     elif item == "Card Distribution":
-        pass  # Implement card distribution functionality here
+        data = currentDeck.getHistogramData("CardType")
+        updateGraphCanvas(data)
 
 
 def updateGraphCanvas(data):
@@ -100,7 +107,11 @@ def updateGraphCanvas(data):
     """
 
     # Ensure keys and values are integers
-    data = {int(key): int(value) for key, value in data.items()}
+    data = {key: value for key, value in data.items()}
+
+    # Clear the existing graph from the canvas
+    for widget in app.getCanvas("GraphCanvas").winfo_children():
+        widget.destroy()
 
     # Create a Matplotlib figure
     fig, ax = plt.subplots(figsize=(5, 4))

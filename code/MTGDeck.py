@@ -56,10 +56,10 @@ class MTGDeck(Deck, ABC):
         """
 
         values = {}
+        parsedData: dict = {}
 
         # CMC histogram
         if histogramType == "CMC":
-            parsedData: dict = {}
             for card in self.cards:
                 if card.getCMC() != 0:
                     if card.getCMC() in parsedData:
@@ -67,14 +67,14 @@ class MTGDeck(Deck, ABC):
                     else:
                         parsedData[card.getCMC()] = 1
 
-            print(card.getName(), " ", card.getCMC())
             values = parsedData
 
         # CardType histogram
         elif histogramType == "CardType":
             parsedData: dict
-            for card in self:
+            for card in self.cards:
                 if card.getCardType() in parsedData:
+                    print(f"CardType: {card.getCardType()}")
                     parsedData[card.getCardType()] += 1
                 else:
                     parsedData[card.getCardType()] = 1
@@ -82,5 +82,4 @@ class MTGDeck(Deck, ABC):
         else:
             return values
 
-        print(values)  # Debugging
         return values
