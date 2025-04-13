@@ -56,3 +56,36 @@ class MTGDeck(Deck, ABC):
             "CMCs": [card.getCMC() for card in self.cards],
         }
         return deck_data
+
+    @abstractmethod
+    def getHistogramData(self, histogramType) -> dict:
+        """Return a dict that has relevant data for Histograms
+        Params: Histogram Type, CMC, CardType
+        """
+
+        values = {}
+
+        # CMC histogram
+        if histogramType == "CMC":
+            parsedData: dict = {}
+            for card in self.cards:
+                if card.getCMC() != 0:
+                    if card.getCMC() in parsedData:
+                        parsedData[card.getCMC()] += 1
+                    else:
+                        parsedData[card.getCMC()] = 1
+            values = parsedData
+
+        # CardType histogram
+        elif histogramType == "CardType":
+            parsedData: dict
+            for card in self:
+                if card.getCardType() in parsedData:
+                    parsedData[card.getCardType()] += 1
+                else:
+                    parsedData[card.getCardType()] = 1
+            values = parsedData
+        else:
+            return values
+
+        return values

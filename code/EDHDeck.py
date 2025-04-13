@@ -65,3 +65,6 @@ class EDHDeck(MTGDeck):
 
     def getDeckData(self):
         return super().getDeckData()
+
+    def getHistogramData(self, histogramType):
+        return super().getHistogramData(histogramType)
