@@ -2,6 +2,8 @@
 from appJar import gui
 from DeckParser import DeckParser
 import re
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # import filefun
 # import matplotlib.pyplot as plt
@@ -66,6 +68,50 @@ def formatChanged():
         app.hideEntry("Commander Name")
 
 
+def dataMenuControls(item):
+    """
+    DataMenuControl function
+
+    Args:
+        Item that was clicked
+    Returns:
+        Nothing.
+    """
+    if item == "Type Search":
+        pass  # Implement type search functionality here
+    elif item == "Mana Curve":
+        data = currentDeck.getHistogramData("CMC")
+        updateGraphCanvas(data)
+    elif item == "Permanents":
+        pass  # Implement permanents functionality here
+    elif item == "Spells":
+        pass  # Implement spells functionality here
+    elif item == "Card Distribution":
+        pass  # Implement card distribution functionality here
+
+
+def updateGraphCanvas(data):
+    """
+    Update the GraphCanvas with a graph based on the provided data.
+
+    Args:
+        data (dict): A dictionary containing the data for the graph.
+    """
+    # Create a Matplotlib figure
+    fig, ax = plt.subplots(figsize=(5, 4))
+
+    # Example: Create a bar chart from the data
+    ax.bar(data.keys(), data.values(), color="skyblue")
+    ax.set_title("Card Data")
+    ax.set_xlabel("Categories")
+    ax.set_ylabel("Counts")
+
+    # Embed the figure into the AppJar canvas
+    canvas = FigureCanvasTkAgg(fig, app.getCanvas("GraphCanvas"))
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+
+
 # Start GUI func
 def startGUI():
     """
@@ -91,7 +137,7 @@ def menuControls(item):
 
 
 ### GUI
-app = gui("MTGDeckStats", "800x600")
+app = gui("MTGDeckStats", "1000x1000")
 # Stickiness and strechiness
 app.setSticky("new")  # North, East, West
 app.setStretch("column")
@@ -119,8 +165,6 @@ app.addFileEntry("DeckUpload")
 app.addButton("Load", press)
 
 
-app.startPanedFrame("MainFrame")
-
 ### Left window
 app.startPanedFrame("Data")
 # Deck Preview window.
@@ -131,5 +175,8 @@ app.startPanedFrame("Graphs")
 # Graphs
 app.addCanvas("GraphCanvas")
 # # DataMenu
-# dataMenu = ["Type Search", "Mana Curve", "Permanents", "Spells", "Card Distribution"]
-# app.addMenuList("Data", dataMenu, dataMenuControls)
+dataMenu = ["Type Search", "Mana Curve", "Permanents", "Spells", "Card Distribution"]
+app.addMenuList("Data", dataMenu, dataMenuControls)
+
+app.stopPanedFrame()
+app.stopPanedFrame()
