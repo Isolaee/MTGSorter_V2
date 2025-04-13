@@ -4,6 +4,7 @@ from DeckParser import DeckParser
 import re
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.ticker import MaxNLocator
 
 # import filefun
 # import matplotlib.pyplot as plt
@@ -97,6 +98,10 @@ def updateGraphCanvas(data):
     Args:
         data (dict): A dictionary containing the data for the graph.
     """
+
+    # Ensure keys and values are integers
+    data = {int(key): int(value) for key, value in data.items()}
+
     # Create a Matplotlib figure
     fig, ax = plt.subplots(figsize=(5, 4))
 
@@ -105,6 +110,9 @@ def updateGraphCanvas(data):
     ax.set_title("Card Data")
     ax.set_xlabel("Categories")
     ax.set_ylabel("Counts")
+
+    # Ensure Y-axis ticks are whole numbers
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Embed the figure into the AppJar canvas
     canvas = FigureCanvasTkAgg(fig, app.getCanvas("GraphCanvas"))
