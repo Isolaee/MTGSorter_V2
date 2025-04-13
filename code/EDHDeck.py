@@ -15,7 +15,7 @@ class EDHDeck(MTGDeck):
         commander: MTGCard,
         scryfallStatic: str,
     ) -> None:
-        super().__init__(name, scryfallStatic)
+        super().__init__(name, cards, scryfallStatic)
         self.name = name
         self.format = format
         self.formatRules = formatRules
@@ -63,8 +63,17 @@ class EDHDeck(MTGDeck):
         card_counts = Counter(card.getName() for card in self.cards)
         return dict(card_counts)
 
-    def getDeckData(self):
-        return super().getDeckData()
+    def getDeckData(self) -> dict:
+        """Return the deck data as a dictionary. This data is meant to be used for graphical representation."""
+        deck_data = {
+            "name": self.getName(),
+            "format": self.getFormat(),
+            "formatRules": self.getFormatRules(),
+            "commander": self.getCommander(),
+            "cards": self.getAllCardNames(),
+            "CMCs": [card.getCMC() for card in self.cards],
+        }
+        return deck_data
 
     def getHistogramData(self, histogramType):
         return super().getHistogramData(histogramType)

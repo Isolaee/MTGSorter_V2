@@ -1,18 +1,19 @@
 from typing import TypeVar
-from PlayingCard import PlayingCard  # Assuming MTGCard inherits from PlayingCard
+from MTGCard import MTGCard  # Assuming MTGCard inherits from PlayingCard
 from Deck import Deck
 from abc import ABC, abstractmethod
 
 # Define a TypeVar for the card type
-T = TypeVar("T", bound=PlayingCard)  # T must be a subclass of PlayingCard
+T = TypeVar("T", bound=MTGCard)  # T must be a subclass of PlayingCard
 
 
 class MTGDeck(Deck, ABC):
     """Class representing a deck of Magic: The Gathering cards."""
 
-    def __init__(self, name: str, scryfallStatic: str) -> None:
+    def __init__(self, name: str, cards: list[T], scryfallStatic: str) -> None:
         super().__init__(name)
         self.name = name
+        self.cards: list = cards
         self.scryfallStatic = scryfallStatic
 
     @abstractmethod
@@ -47,15 +48,7 @@ class MTGDeck(Deck, ABC):
     @abstractmethod
     def getDeckData(self) -> dict:
         """Return the deck data as a dictionary. This data is meant to be used for graphical representation."""
-        deck_data = {
-            "name": self.getName(),
-            "format": self.getFormat(),
-            "formatRules": self.getFormatRules(),
-            "commander": self.getCommander(),
-            "cards": self.getAllCardNames(),
-            "CMCs": [card.getCMC() for card in self.cards],
-        }
-        return deck_data
+        pass
 
     @abstractmethod
     def getHistogramData(self, histogramType) -> dict:
@@ -74,6 +67,8 @@ class MTGDeck(Deck, ABC):
                         parsedData[card.getCMC()] += 1
                     else:
                         parsedData[card.getCMC()] = 1
+
+            print(card.getName(), " ", card.getCMC())
             values = parsedData
 
         # CardType histogram
@@ -88,4 +83,5 @@ class MTGDeck(Deck, ABC):
         else:
             return values
 
+        print(values)  # Debugging
         return values
