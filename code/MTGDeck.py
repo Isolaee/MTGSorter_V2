@@ -10,11 +10,10 @@ T = TypeVar("T", bound=MTGCard)  # T must be a subclass of PlayingCard
 class MTGDeck(Deck, ABC):
     """Class representing a deck of Magic: The Gathering cards."""
 
-    def __init__(self, name: str, cards: list[T], scryfallStatic: str) -> None:
+    def __init__(self, name: str, cards: list[T]) -> None:
         super().__init__(name)
         self.name = name
         self.cards: list = cards
-        self.scryfallStatic = scryfallStatic
 
     @abstractmethod
     def getName(self) -> str:

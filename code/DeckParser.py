@@ -77,5 +77,4 @@ class DeckParser:
             formatRules=["Singleton", "100 cards"],
             cards=cards,
             commander=commander,
-            scryfallStatic="https://scryfall.com",
         )

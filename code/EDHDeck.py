@@ -13,9 +13,8 @@ class EDHDeck(MTGDeck):
         formatRules: list,
         cards: list,
         commander: MTGCard,
-        scryfallStatic: str,
     ) -> None:
-        super().__init__(name, cards, scryfallStatic)
+        super().__init__(name, cards)
         self.name = name
         self.format = format
         self.formatRules = formatRules
