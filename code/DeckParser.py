@@ -1,5 +1,6 @@
 from EDHDeck import EDHDeck
 from MTGCard import MTGCard
+from pathlib import Path
 import json
 
 
@@ -89,3 +90,77 @@ class DeckParser:
             cards=cards,
             commander=commander,
         )
+
+    @staticmethod
+    def serializeDeck(deck) -> None:
+        """
+        Serialize the EDHDeck object to a JSON file.
+
+        Args:
+            deck (EDHDeck): The deck object to serialize.
+        """
+        file_path = "Decks/" + deck["name"] + ".json"
+        with open(file_path, "w", encoding="utf-8") as file:
+            json.dump(deck, file, indent=4)
+
+    @staticmethod
+    def deserializeDeck(file_path: str) -> EDHDeck:
+        """
+        Deserialize an EDHDeck object from a JSON file.
+
+        Args:
+            file_path (str): The path to the JSON file.
+
+        Returns:
+            EDHDeck: The deserialized deck object.
+        """
+        with open(file_path, "r", encoding="utf-8") as file:
+            deck_data = json.load(file)
+
+        # Recreate the MTGCard objects
+        cards = [MTGCard(**card_data) for card_data in deck_data["cards"]]
+
+        # Recreate the commander object
+        commander = MTGCard(**deck_data["commander"]) if deck_data["commander"] else None
+
+        # Return the reconstructed EDHDeck object
+        return EDHDeck(
+            name=deck_data["name"],
+            format=deck_data["format"],
+            formatRules=deck_data["formatRules"],
+            cards=cards,
+            commander=commander,
+        )
+
+    @staticmethod
+    def read_folder_contents(folder_path):
+        """
+        Read the contents of a folder and return a list of file names.
+
+        Args:
+            folder_path (str): The path to the folder.
+
+        Returns:
+            list: A list of file names in the folder.
+        """
+        folder = Path(folder_path)
+        if folder.exists() and folder.is_dir():
+            return [item.name for item in folder.iterdir() if item.is_file()]
+        else:
+            print(f"The folder '{folder_path}' does not exist.")
+            return []
+
+    ## Saved Decks
+    def loadSavedDecks(file_path: str):
+        """
+        Load saved decks from the JSON file.
+
+        Returns:
+            list: A list of saved decks.
+        """
+
+        try:
+            with open(file_path, "r") as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return []

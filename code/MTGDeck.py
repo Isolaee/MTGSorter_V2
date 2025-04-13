@@ -83,3 +83,13 @@ class MTGDeck(Deck, ABC):
             return values
 
         return values
+
+    def to_dict(self):
+        """Convert the EDHDeck object to a dictionary."""
+        return {
+            "name": self.name,
+            "format": self.format,
+            "formatRules": self.formatRules,
+            "commander": self.commander.to_dict() if self.commander else None,
+            "cards": [card.to_dict() for card in self.cards],
+        }

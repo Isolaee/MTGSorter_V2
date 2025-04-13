@@ -113,3 +113,24 @@ class MTGCard(PlayingCard):
 
     def __eq__(self, other):
         return super().__eq__(other)
+
+    def to_dict(self):
+        """Convert the MTGCard object to a dictionary."""
+        return {
+            "name": self.name,
+            "manacost": self.manacost,
+            "cmc": self.cmc,
+            "colors": self.colors,
+            "power": self.power,
+            "toughness": self.toughness,
+            "oracleText": self.oracleText,
+            "loyalty": self.loyalty,
+            "typeline": self.typeline,
+            "cardType": self.cardType,
+            "cardFaces": self.cardFaces,
+            "allParts": self.allParts,
+            "layout": self.layout,
+            "artist": self.artist,
+            "scryfallid": self.scryfallid,
+            "legalities": self.legalities,
+        }

@@ -15,6 +15,7 @@ from matplotlib.ticker import MaxNLocator
 
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
 regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
+saved_decks_path = "./Decks"  # Path to the folder containing saved decks
 
 
 def press(btn):
@@ -131,6 +132,17 @@ def updateGraphCanvas(data):
     canvas.get_tk_widget().pack()
 
 
+def populateSavedDecksMenu():
+    """
+    Populate the dropdown menu with saved decks from the folder.
+    """
+    saved_decks = DeckParser.read_folder_contents(saved_decks_path)
+    if saved_decks:
+        app.changeOptionBox("Saved Decks", saved_decks)
+    else:
+        app.changeOptionBox("Saved Decks", ["No saved decks found"])
+
+
 # Start GUI func
 def startGUI():
     """
@@ -199,3 +211,46 @@ app.addMenuList("Data", dataMenu, dataMenuControls)
 
 app.stopPanedFrame()
 app.stopPanedFrame()
+
+
+# Add a button to load the selected deck
+def loadSelectedDeck():
+    """
+    Load the selected deck from the dropdown menu.
+    """
+    selected_deck = app.getOptionBox("Saved Decks")
+    if selected_deck and selected_deck != "No saved decks found":
+        file_path = f"Decks/{selected_deck}"  # Construct the full file path
+        try:
+            global currentDeck
+            currentDeck = DeckParser.deserializeDeck(file_path)
+            print(f"Loaded deck: {currentDeck.getName()}")
+            # Update the DeckPreview list box
+            app.clearListBox("DeckPreview", callFunction=False)
+            unPackCardNames()
+        except Exception as e:
+            print(f"Error loading deck: {e}")
+
+
+## Save deck
+def saveCurrentDeck():
+    """Save the current deck to a file."""
+    cond = None
+    if currentDeck != cond:
+        DeckParser.serializeDeck(currentDeck.to_dict())
+
+
+# Add Saved Decks section
+app.addLabel("SavedDecksLabel", "Saved Decks")
+app.addListBox(
+    "SavedDecks", [deck for deck in DeckParser.read_folder_contents(saved_decks_path)]
+)
+app.addButton("Load Deck", loadSelectedDeck)
+app.addButton("Save Deck", saveCurrentDeck)
+
+# Add a dropdown menu for saved decks
+app.addLabelOptionBox("Saved Decks", ["No saved decks found"])
+app.addButton("Load Selected Deck", loadSelectedDeck)
+
+# Populate the dropdown menu when the GUI starts
+populateSavedDecksMenu()
