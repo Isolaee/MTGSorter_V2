@@ -13,3 +13,15 @@ The short term plan is to implement two panel system to my GUI. Right panel woul
 # TODO
 I also implented the method for my deckdata. So assume that I will/can implement different (Mana curve etc) graphs tomorrow.
 </details>
+
+<details>
+<summary>14/04</summary>
+
+# Filling the different cards.
+One of the goals of this rewrite was to increase errorhandling. Or rather make better pipeline from cardname to card Obj. Unfortunatelu I forgot a thing. In MTG these is cards called MDFC. Modal double-faced cards. Their names are written as "Side1 // side2". This is not feasable to my software at the moment. The software refuses any MDFC and thus the decklists might be incomplete. Hopefully this is fixable with regex update.
+
+# GUI
+The deckupload can be handled by clicking saved deck.
+GUI is as big as its content. Same as Saved Decks list.
+Basicly the saving and loading saved decks feel better and require less clicks.
+</details>
