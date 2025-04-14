@@ -51,6 +51,11 @@ class DeckParser:
                     if creature_type_match:
                         cardType = creature_type_match.group("CardType")
                         creatureType = creature_type_match.group("CreatureType")
+                    else:
+                        cardType = (
+                            "Unknown"  # Assign a default value for cardType if needed
+                        )
+                        creatureType = ""  # Assign a default value for creatureType
 
                     card = MTGCard(
                         name=card_name,
@@ -61,7 +66,7 @@ class DeckParser:
                         toughness=card_data.get("toughness"),
                         oracleText=card_data.get("oracle_text"),
                         loyalty=card_data.get("loyalty"),
-                        typeline=creatureType if creatureType is not None else [],
+                        typeline=creatureType,
                         cardType=cardType,
                         cardFaces=card_data.get("card_faces"),
                         allParts=card_data.get("all_parts"),
@@ -99,7 +104,8 @@ class DeckParser:
         Args:
             deck (EDHDeck): The deck object to serialize.
         """
-        file_path = "Decks/" + deck["name"] + ".json"
+        file_path = "Decks/" + deck.name + ".json"
+        deck = deck.to_dict()  # Convert the deck object to a dictionary
         with open(file_path, "w", encoding="utf-8") as file:
             json.dump(deck, file, indent=4)
 
@@ -117,11 +123,23 @@ class DeckParser:
         with open(file_path, "r", encoding="utf-8") as file:
             deck_data = json.load(file)
 
-        # Recreate the MTGCard objects
-        cards = [MTGCard(**card_data) for card_data in deck_data["cards"]]
+        # Validate and recreate the MTGCard objects
+        cards = []
+        for card_data in deck_data["cards"]:
+            if isinstance(card_data, dict):  # Ensure card_data is a dictionary
+                cards.append(MTGCard(**card_data))
+            else:
+                raise ValueError(f"Invalid card data: {card_data}")
 
-        # Recreate the commander object
-        commander = MTGCard(**deck_data["commander"]) if deck_data["commander"] else None
+        # Validate and recreate the commander object
+        commander = None
+        if deck_data["commander"]:
+            if isinstance(
+                deck_data["commander"], dict
+            ):  # Ensure commander is a dictionary
+                commander = MTGCard(**deck_data["commander"])
+            else:
+                raise ValueError(f"Invalid commander data: {deck_data['commander']}")
 
         # Return the reconstructed EDHDeck object
         return EDHDeck(
@@ -151,6 +169,7 @@ class DeckParser:
             return []
 
     ## Saved Decks
+    @staticmethod
     def loadSavedDecks(file_path: str):
         """
         Load saved decks from the JSON file.

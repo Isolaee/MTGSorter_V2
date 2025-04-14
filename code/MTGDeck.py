@@ -89,6 +89,10 @@ class MTGDeck(Deck, ABC):
             "name": self.name,
             "format": self.format,
             "formatRules": self.formatRules,
-            "commander": self.commander.to_dict() if self.commander else None,
+            "commander": (
+                self.commander
+                if isinstance(self.commander, str)
+                else self.commander.to_dict() if self.commander else None
+            ),
             "cards": [card.to_dict() for card in self.cards],
         }

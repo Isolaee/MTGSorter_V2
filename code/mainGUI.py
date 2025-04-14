@@ -242,7 +242,7 @@ def saveCurrentDeck():
     """Save the current deck to a file."""
     cond = None
     if currentDeck != cond:
-        DeckParser.serializeDeck(currentDeck.to_dict())
+        DeckParser.serializeDeck(currentDeck)
     populateSavedDecks()
 
 
