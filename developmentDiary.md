@@ -19,6 +19,10 @@ I also implented the method for my deckdata. So assume that I will/can implement
 
 # Filling the different cards.
 One of the goals of this rewrite was to increase errorhandling. Or rather make better pipeline from cardname to card Obj. Unfortunatelu I forgot a thing. In MTG these is cards called MDFC. Modal double-faced cards. Their names are written as "Side1 // side2". This is not feasable to my software at the moment. The software refuses any MDFC and thus the decklists might be incomplete. Hopefully this is fixable with regex update.
+Update:
+This is due:
+My data, where every card data is found, has names as "side1/side2", but every deckbuilding site export cards just as name = side1.
+I need to reporgram way I look data from my file.
 
 # GUI
 The deckupload can be handled by clicking saved deck.
