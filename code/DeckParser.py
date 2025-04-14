@@ -22,68 +22,68 @@ class DeckParser:
         if format != "Commander":
             commander = None
 
-            # Load Scryfall data from JSON
+        # Load Scryfall data from JSON using json_stream
         with open(ScryData, "r", encoding="utf-8") as scryfall_file:
             scryfall_data = json.load(scryfall_file)
 
-        with open(file_path, "r") as file:
+            with open(file_path, "r") as file:
+                for line in file:
+                    try:
+                        match = regex_engine_card.search(line)
+                        if not match:
+                            raise ValueError(f"Invalid line format: {line.strip()}")
+                        card_name = match.group("name").strip()
+                        quantity = int(match.group("amount"))
 
-            for line in file:
-                try:
-                    match = regex_engine_card.search(line)
-                    if not match:
-                        raise ValueError(f"Invalid line format: {line.strip()}")
-                    card_name = match.group("name").strip()
-                    quantity = int(match.group("amount"))
+                        # Find card data in Scryfall JSON
+                        card_data = next(
+                            (card for card in scryfall_data if card["name"] == card_name),
+                            None,
+                        )
+                        if not card_data:
+                            raise ValueError(
+                                f"Card '{card_name}' not found in Scryfall data."
+                            )
 
-                    ## Get card Data from Scryfall
-                    # Find card data in Scryfall JSON
-                    card_data = next(
-                        (card for card in scryfall_data if card["name"] == card_name),
-                        None,
-                    )
-                    if not card_data:
-                        raise ValueError(
-                            f"Card '{card_name}' not found in Scryfall data."
+                        creature_type_match = regex_engine_type.search(
+                            card_data["type_line"]
+                        )
+                        if creature_type_match:
+                            cardType = creature_type_match.group("CardType")
+                            creatureType = creature_type_match.group("CreatureType")
+                        else:
+                            cardType = (
+                                "Unknown"  # Assign a default value for cardType if needed
+                            )
+                            creatureType = ""  # Assign a default value for creatureType
+
+                        card = MTGCard(
+                            name=card_name,
+                            manacost=card_data.get("mana_cost"),
+                            cmc=card_data.get("cmc"),
+                            colors=card_data.get("colors"),
+                            power=card_data.get("power"),
+                            toughness=card_data.get("toughness"),
+                            oracleText=card_data.get("oracle_text"),
+                            loyalty=card_data.get("loyalty"),
+                            typeline=creatureType,
+                            cardType=cardType,
+                            cardFaces=card_data.get("card_faces"),
+                            allParts=card_data.get("all_parts"),
+                            layout=card_data.get("layout"),
+                            artist=card_data.get("artist"),
+                            scryfallid=card_data.get("id"),
+                            legalities="Commander",
                         )
 
-                    creature_type_match = regex_engine_type.search(card_data["type_line"])
-                    if creature_type_match:
-                        cardType = creature_type_match.group("CardType")
-                        creatureType = creature_type_match.group("CreatureType")
-                    else:
-                        cardType = (
-                            "Unknown"  # Assign a default value for cardType if needed
-                        )
-                        creatureType = ""  # Assign a default value for creatureType
+                        for _ in range(quantity):
+                            cards.append(card)
 
-                    card = MTGCard(
-                        name=card_name,
-                        manacost=card_data.get("mana_cost"),
-                        cmc=card_data.get("cmc"),
-                        colors=card_data.get("colors"),
-                        power=card_data.get("power"),
-                        toughness=card_data.get("toughness"),
-                        oracleText=card_data.get("oracle_text"),
-                        loyalty=card_data.get("loyalty"),
-                        typeline=creatureType,
-                        cardType=cardType,
-                        cardFaces=card_data.get("card_faces"),
-                        allParts=card_data.get("all_parts"),
-                        layout=card_data.get("layout"),
-                        artist=card_data.get("artist"),
-                        scryfallid=card_data.get("id"),
-                        legalities="Commander",
-                    )
-
-                    for _ in range(quantity):
-                        cards.append(card)
-
-                    if card_name == commander_name:
-                        commander = card
-                except ValueError as e:
-                    print(f"Error': {e}")
-                    continue
+                        if card_name == commander_name:
+                            commander = card
+                    except ValueError as e:
+                        print(f"Error': {e}")
+                        continue
 
         if not commander:
             raise ValueError(f"Commander '{commander_name}' not found in the deck list.")
@@ -183,3 +183,120 @@ class DeckParser:
                 return json.load(file)
         except FileNotFoundError:
             return []
+
+    @staticmethod
+    def find_line_with_name(target_names: list) -> dict:
+        """
+        Find entries in a JSON file where the 'name' field matches any of the target strings
+        and save the corresponding data in a dictionary. Remove processed names from the target list.
+
+        Args:
+            target_names (list): The names to search for.
+
+        Returns:
+            dict: A dictionary containing the matching 'name' fields and their corresponding JSON objects.
+        """
+        file_path = "Data\\ScryfallCardData13_04_2025.json"
+        deckData: dict = {}
+
+        with open(file_path, "r", encoding="utf-8") as file:
+            # Load the JSON data
+            json_data = json.load(file)
+
+            # Iterate through the JSON data
+            for entry in json_data:
+                # Check if the 'name' field matches any of the target names
+                if entry.get("name") in target_names:
+                    # Add the matching entry to the result dictionary
+                    deckData[entry["name"]] = entry
+                    # Remove the name from the target list
+                    target_names.remove(entry["name"])
+
+                # Stop if there are no more names to find
+                if not target_names:
+                    break
+
+        return deckData
+
+    @staticmethod
+    def CreateDictkWithList(
+        file_path: str,
+        regex_engine_card,
+    ):
+        cardNames: dict = {}
+
+        with open(file_path, "r") as file:
+            i = 0
+            for line in file:
+                try:
+                    match = regex_engine_card.search(line)
+                    if not match:
+                        raise ValueError(f"Invalid line format: {line.strip()}")
+                    card_name = match.group("name").strip()
+                    quantity = int(match.group("amount"))
+                    cardNames[i] = {"name": card_name, "quantity": quantity}
+                    i += 1
+                except ValueError as e:
+                    print(f"Error': {e}")
+                continue
+
+        return cardNames
+
+    @staticmethod
+    def CreateEDHDeck(
+        file_path: str,
+        deck_name: str,
+        commander_name: str,
+        regex_engine_card,
+        regex_engine_type,
+    ) -> EDHDeck:
+
+        cards: list = []
+
+        namesDict = DeckParser.CreateDictkWithList(file_path, regex_engine_card)
+
+        cardsDict = DeckParser.find_line_with_name(namesDict)
+        # print(cardsDict)
+        print("Creating deck. STEP 3")
+        for card in cardsDict.items():
+            creature_type_match = regex_engine_type.search(card["type_line"])
+            if creature_type_match:
+                cardType = creature_type_match.group("CardType")
+                creatureType = creature_type_match.group("CreatureType")
+            else:
+                cardType = "Unknown"  # Assign a default value for cardType if needed
+                creatureType = ""  # Assign a default value for creatureType
+
+            card = MTGCard(
+                name=card.get("name"),
+                manacost=card.get("mana_cost"),
+                cmc=card.get("cmc"),
+                colors=card.get("colors"),
+                power=card.get("power"),
+                toughness=card.get("toughness"),
+                oracleText=card.get("oracle_text"),
+                loyalty=card.get("loyalty"),
+                typeline=creatureType,
+                cardType=cardType,
+                cardFaces=card.get("card_faces"),
+                allParts=card.get("all_parts"),
+                layout=card.get("layout"),
+                artist=card.get("artist"),
+                scryfallid=card.get("id"),
+                legalities="Commander",
+            )
+            for _ in range(namesDict[card]["quantity"]):
+                cards.append(card)
+
+        print(
+            "Deck created. STEP 4 Return",
+        )
+        deck = EDHDeck(
+            name=deck_name,
+            format="Commander",
+            formatRules=["Singleton", "100 cards"],
+            cards=cards,
+            commander=commander_name,
+        )
+        print(deck.getAllCardNames())
+        return deck

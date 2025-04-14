@@ -38,11 +38,11 @@ def press(btn):
         if format == "Commander":
             commander_name = app.getEntry("Commander Name")
 
-        # Pass the regex engine to the DeckParser
-        currentDeck = DeckParser.CreateDeck(
+        # Pass the regex engine to the DeckParser ### Testing CreateEDHDeck
+        currentDeck = DeckParser.CreateEDHDeck(
             file_path,
             deck_name,
-            format,
+            # format,
             commander_name,
             regex_engine_card,
             regex_engine_type,
