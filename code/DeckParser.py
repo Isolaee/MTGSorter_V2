@@ -61,7 +61,7 @@ class DeckParser:
                         toughness=card_data.get("toughness"),
                         oracleText=card_data.get("oracle_text"),
                         loyalty=card_data.get("loyalty"),
-                        typeline=creatureType,
+                        typeline=creatureType if creatureType is not None else [],
                         cardType=cardType,
                         cardFaces=card_data.get("card_faces"),
                         allParts=card_data.get("all_parts"),

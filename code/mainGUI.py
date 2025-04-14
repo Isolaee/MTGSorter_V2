@@ -132,17 +132,6 @@ def updateGraphCanvas(data):
     canvas.get_tk_widget().pack()
 
 
-def populateSavedDecksMenu():
-    """
-    Populate the dropdown menu with saved decks from the folder.
-    """
-    saved_decks = DeckParser.read_folder_contents(saved_decks_path)
-    if saved_decks:
-        app.changeOptionBox("Saved Decks", saved_decks)
-    else:
-        app.changeOptionBox("Saved Decks", ["No saved decks found"])
-
-
 # Start GUI func
 def startGUI():
     """
@@ -167,8 +156,42 @@ def menuControls(item):
         app.stop()
 
 
+def showCardIMG(clickedCard):
+    """
+    Show the card image in the DeckPreview list box.
+
+    Args:
+        card_name (str): The name of the card to show.
+    """
+    # selected_items = app.getListBox(clickedCard)
+    # print(f"Selected items: {selected_items}")
+    ### Find the card and show its image in grpah canvas
+    # TODO: Implement the logic to show the card image in the graph canvas
+    # Problem: Scryfall provides a static URL for the card image, but we need to find a way to display it in the app.
+
+
+def loadDeckByClick(clickedDeck):
+    """
+    Load the deck by clicking on the list box.
+
+    Args:
+        clickedDeck (str): The name of the clicked deck.
+    """
+    selected_deck = app.getListBox(clickedDeck)
+    if selected_deck:
+        file_path = f"Decks/{selected_deck[0]}"  # Construct the full file path
+        try:
+            global currentDeck
+            currentDeck = DeckParser.deserializeDeck(file_path)
+            # Update the DeckPreview list box
+            app.clearListBox("DeckPreview", callFunction=False)
+            unPackCardNames()
+        except Exception as e:
+            print(f"Error loading deck: {e}")
+
+
 ### GUI
-app = gui("MTGDeckStats", "1000x1000")
+app = gui("MTGDeckStats", "1400x1000")
 # Stickiness and strechiness
 app.setSticky("new")  # North, East, West
 app.setStretch("column")
@@ -200,6 +223,7 @@ app.addButton("Load", press)
 app.startPanedFrame("Data")
 # Deck Preview window.
 app.addListBox("DeckPreview")
+app.setListBoxChangeFunction("DeckPreview", showCardIMG)
 
 ### Right window
 app.startPanedFrame("Graphs")
@@ -213,23 +237,10 @@ app.stopPanedFrame()
 app.stopPanedFrame()
 
 
-# Add a button to load the selected deck
-def loadSelectedDeck():
-    """
-    Load the selected deck from the dropdown menu.
-    """
-    selected_deck = app.getOptionBox("Saved Decks")
-    if selected_deck and selected_deck != "No saved decks found":
-        file_path = f"Decks/{selected_deck}"  # Construct the full file path
-        try:
-            global currentDeck
-            currentDeck = DeckParser.deserializeDeck(file_path)
-            print(f"Loaded deck: {currentDeck.getName()}")
-            # Update the DeckPreview list box
-            app.clearListBox("DeckPreview", callFunction=False)
-            unPackCardNames()
-        except Exception as e:
-            print(f"Error loading deck: {e}")
+def populateSavedDecks():
+    app.clearListBox("SavedDecks")
+    saved_decks = [deck for deck in DeckParser.read_folder_contents(saved_decks_path)]
+    app.addListItems("SavedDecks", saved_decks)
 
 
 ## Save deck
@@ -238,19 +249,14 @@ def saveCurrentDeck():
     cond = None
     if currentDeck != cond:
         DeckParser.serializeDeck(currentDeck.to_dict())
+    populateSavedDecks()
 
 
+# --------------
 # Add Saved Decks section
 app.addLabel("SavedDecksLabel", "Saved Decks")
-app.addListBox(
-    "SavedDecks", [deck for deck in DeckParser.read_folder_contents(saved_decks_path)]
-)
-app.addButton("Load Deck", loadSelectedDeck)
+app.addListBox("SavedDecks", [])
+app.setListBoxChangeFunction("SavedDecks", loadDeckByClick)
+populateSavedDecks()
+
 app.addButton("Save Deck", saveCurrentDeck)
-
-# Add a dropdown menu for saved decks
-app.addLabelOptionBox("Saved Decks", ["No saved decks found"])
-app.addButton("Load Selected Deck", loadSelectedDeck)
-
-# Populate the dropdown menu when the GUI starts
-populateSavedDecksMenu()
