@@ -185,7 +185,8 @@ def loadDeckByClick(clickedDeck):
 
 
 ### GUI
-app = gui("MTGDeckStats", "1400x1000")
+app = gui("MTGDeckStats")
+app.setResizable(canResize=True)
 # Stickiness and strechiness
 app.setSticky("new")  # North, East, West
 app.setStretch("column")
@@ -232,9 +233,19 @@ app.stopPanedFrame()
 
 
 def populateSavedDecks():
+    """
+    Populate the Saved Decks list box with the contents of the saved decks folder
+    and adjust its size to fit the content.
+    """
     app.clearListBox("SavedDecks")
-    saved_decks = [deck for deck in DeckParser.read_folder_contents(saved_decks_path)]
+    saved_decks = list(
+        DeckParser.read_folder_contents(saved_decks_path)
+    )  # Convert generator to list
     app.addListItems("SavedDecks", saved_decks)
+
+    # Dynamically adjust the size of the listbox
+    num_rows = len(saved_decks)
+    app.setListBoxRows("SavedDecks", num_rows if num_rows > 0 else 1)  # At least 1 row
 
 
 ## Save deck
