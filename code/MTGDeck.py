@@ -74,7 +74,6 @@ class MTGDeck(Deck, ABC):
             parsedData: dict
             for card in self.cards:
                 if card.getCardType() in parsedData:
-                    print(f"CardType: {card.getCardType()}")
                     parsedData[card.getCardType()] += 1
                 else:
                     parsedData[card.getCardType()] = 1
