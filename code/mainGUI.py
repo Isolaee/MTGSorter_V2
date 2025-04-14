@@ -6,12 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
 
-# import filefun
-# import matplotlib.pyplot as plt
-# import numpy as np
-# From here below are for histogram
-# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# from matplotlib.figure import Figure
 
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
 regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
@@ -252,7 +246,6 @@ def saveCurrentDeck():
     populateSavedDecks()
 
 
-# --------------
 # Add Saved Decks section
 app.addLabel("SavedDecksLabel", "Saved Decks")
 app.addListBox("SavedDecks", [])
