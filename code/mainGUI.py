@@ -225,7 +225,7 @@ app.startPanedFrame("Graphs")
 # Graphs
 app.addCanvas("GraphCanvas")
 # # DataMenu
-dataMenu = ["Type Search", "Mana Curve", "Permanents", "Spells", "Card Distribution"]
+dataMenu = ["Mana Curve", "Card Distribution"]
 app.addMenuList("Data", dataMenu, dataMenuControls)
 
 app.stopPanedFrame()
