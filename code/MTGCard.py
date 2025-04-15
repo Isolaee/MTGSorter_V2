@@ -11,6 +11,7 @@ class MTGCard(PlayingCard):
         manacost: list,
         cmc: int,
         colors: list,
+        colorIdentity: list,
         power: int,
         toughness: int,
         oracleText: str,
@@ -30,6 +31,7 @@ class MTGCard(PlayingCard):
         self.manacost = manacost
         self.cmc = cmc
         self.colors = colors
+        self.colorIdentity = colorIdentity
         self.power = power
         self.toughness = toughness
         self.oracleText = oracleText
@@ -58,6 +60,10 @@ class MTGCard(PlayingCard):
     def getColors(self) -> List[str]:
         """Return the colors of the card."""
         return self.colors
+
+    def getColorIdentity(self) -> List[str]:
+        """Return the color identity of the card."""
+        return self.colorIdentity
 
     def getPower(self) -> int:
         """Return the power of the card."""

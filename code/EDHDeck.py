@@ -6,18 +6,74 @@ from collections import Counter
 class EDHDeck(MTGDeck):
     """Class representing a Commander (EDH) deck of Magic: The Gathering cards."""
 
+    formatRules: dict = {
+        "commander": True,
+        "deck_size": 100,
+        "singleton": True,
+        "banned_cards": [
+            "Ancestral Recall",
+            "Balance",
+            "Biorhythm",
+            "Black Lotus",
+            "Braids, Cabal Minion",
+            "Chaos Orb",
+            "Coalition Victory",
+            "Channel",
+            "Dockside Extortionist",
+            "Emrakul, the Aeons Torn",
+            "Erayo, Soratami Ascendant",
+            "Falling Star",
+            "Fastbond",
+            "Flash",
+            "Gifts Ungiven",
+            "Golos, Tireless Pilgrim",
+            "Griselbrand",
+            "Hullbreacher",
+            "Iona, Shield of Emeria",
+            "Karakas",
+            "Jeweled Lotus",
+            "Leovold, Emissary of Trest",
+            "Library of Alexandria",
+            "Limited Resources",
+            "Lutri, the Spellchaser",
+            "Mana Crypt",
+            "Mox Emerald",
+            "Mox Jet",
+            "Mox Pearl",
+            "Mox Ruby",
+            "Mox Sapphire",
+            "Nadu, Winged Wisdom",
+            "Panoptic Mirror",
+            "Paradox Engine",
+            "Primeval Titan",
+            "Prophet of Kruphix",
+            "Recurring Nightmare",
+            "Rofellos, Llanowar Emissary",
+            "Shahrazad",
+            "Sundering Titan",
+            "Sway of the Stars",
+            "Sylvan Primordial",
+            "Time Vault",
+            "Time Walk",
+            "Tinker",
+            "Tolarian Academy",
+            "Trade Secrets",
+            "Upheaval",
+            "Yawgmoth's Bargain",
+        ],
+        "color_identity": True,
+    }
+
     def __init__(
         self,
         name: str,
         format: str,
-        formatRules: list,
         cards: list,
         commander: MTGCard,
     ) -> None:
         super().__init__(name, cards)
         self.name = name
         self.format = format
-        self.formatRules = formatRules
         self.cards = cards
         self.commander = commander
 
@@ -76,3 +132,60 @@ class EDHDeck(MTGDeck):
 
     def getHistogramData(self, histogramType):
         return super().getHistogramData(histogramType)
+
+    def enforceFormatRules(self) -> tuple[bool, dict]:
+        """Enforce the format rules for the deck."""
+        formatCheckFails: dict = {}
+        isValid: bool = True
+
+        # Check if the commander is in the deck
+        if self.commander.getName() not in self.getAllCardNames():
+            formatCheckFails["Commander"] = "Commander not in deck"
+            isValid = False
+
+        # Check if the deck size is within the Decklimit
+
+        if len(self.cards) + 1 != self.formatRules.get("deck_size"):
+            formatCheckFails["Deck Size"] = (
+                f"Deck size is invalid. Deck has to be: {self.formatRules.get('deck_size')}"
+            )
+            isValid = False
+        else:
+            len(self.cards) == self.formatRules.get("deck_size")
+            pass
+
+        # Check if contains banned cards
+        overlap = set(self.getAllCardNames()) & set(self.formatRules.get("banned_cards"))
+        if overlap:
+            formatCheckFails["Banned Cards"] = (
+                f"Contains banned cards: {', '.join(overlap)}"
+            )
+            isValid = False
+
+        # Check singleton rule
+        singleton_exceptions = ["Plains", "Island", "Swamp", "Mountain", "Forest"]
+        duplicates = [
+            item
+            for item, count in Counter(self.getAllCardNames()).items()
+            if count > 1 and item not in singleton_exceptions
+        ]
+        if duplicates:
+            formatCheckFails["Singleton"] = (
+                f"Contains duplicates: {', '.join(duplicates)}"
+            )
+            isValid = False
+
+        # Check color identity rule
+        commander_color_identity = set(self.commander.getColorIdentity())
+        invalid_cards = [
+            card.getName()
+            for card in self.cards
+            if not set(card.getColorIdentity()).issubset(commander_color_identity)
+        ]
+        if invalid_cards:
+            formatCheckFails["Color Identity"] = (
+                f"Cards with invalid color identity: {', '.join(invalid_cards)}"
+            )
+            isValid = False
+
+        return isValid, formatCheckFails

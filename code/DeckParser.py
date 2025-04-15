@@ -245,6 +245,7 @@ class DeckParser:
     def CreateEDHDeck(
         file_path: str,
         deck_name: str,
+        format: str,
         commander_name: str,
         regex_engine_card,
         regex_engine_type,
@@ -272,6 +273,7 @@ class DeckParser:
                 manacost=card_data.get("mana_cost"),
                 cmc=card_data.get("cmc"),
                 colors=card_data.get("colors"),
+                colorIdentity=card_data.get("color_identity"),
                 power=card_data.get("power", "N/A"),
                 toughness=card_data.get("toughness", "N/A"),
                 oracleText=card_data.get("oracle_text", "No Oracle Text"),
@@ -294,8 +296,14 @@ class DeckParser:
         deck = EDHDeck(
             name=deck_name,
             format="Commander",
-            formatRules=["Singleton", "100 cards"],
             cards=cards,
             commander=commander,
         )
+
+        # Check for format legality
+        isValid, error = deck.enforceFormatRules()
+        cond = False
+        if isValid == cond:
+            raise ValueError(error)
+
         return deck

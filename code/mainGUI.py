@@ -42,7 +42,7 @@ def press(btn):
         currentDeck = DeckParser.CreateEDHDeck(
             file_path,
             deck_name,
-            # format,
+            format,
             commander_name,
             regex_engine_card,
             regex_engine_type,
