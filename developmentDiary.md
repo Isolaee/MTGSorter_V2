@@ -29,3 +29,25 @@ The deckupload can be handled by clicking saved deck.
 GUI is as big as its content. Same as Saved Decks list.
 Basicly the saving and loading saved decks feel better and require less clicks.
 </details>
+
+<details>
+<summary>15/04</summary>
+
+# reading and makings cards
+For some time I have had problem with
+- Loading time
+- Two faced cards.
+Today I have fixed on problem and imporved upon another.
+Now my software do not throw an error when it encounters two faced card. That naming was a problem because it is somewhat different.
+The problem two was quite a hefty loading time when creating a deck. But based on my feeling, it got down a bit because I adjusted the logic.
+
+# Enforcing format rules
+Even tho this software only understand one game and one format, I am going expand on at least different formats. So this is one of the reasons I need to have these format rules enforced. If I load a deck, I need to be able to trust it is "legal". First enforceFormatRules is located in EDHDeck class. I need to think if MTGDeck is better place for it. I could just overload that function to use it in every format.
+
+# Machine Learning
+The biggest part of this ML rewrite is creating new data pipeline and writing new class for data. But because V2 has more robust foundations I think it will be much easier than last time. Also now I have experince on this software.
+Today I imported some of my old code regarding vectorizing code and wrote class for ML-MTGCard.
+
+# TODO: Tests
+I still haven't wrote any tests. That is something I need to do.
+</details>
