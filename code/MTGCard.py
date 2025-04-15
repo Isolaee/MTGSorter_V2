@@ -127,6 +127,7 @@ class MTGCard(PlayingCard):
             "manacost": self.manacost,
             "cmc": self.cmc,
             "colors": self.colors,
+            "colorIdentity": self.colorIdentity,
             "power": self.power,
             "toughness": self.toughness,
             "oracleText": self.oracleText,

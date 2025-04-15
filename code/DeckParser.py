@@ -62,6 +62,7 @@ class DeckParser:
                             manacost=card_data.get("mana_cost"),
                             cmc=card_data.get("cmc"),
                             colors=card_data.get("colors"),
+                            colorIdentity=card_data.get("color_identity"),
                             power=card_data.get("power"),
                             toughness=card_data.get("toughness"),
                             oracleText=card_data.get("oracle_text"),
@@ -145,7 +146,6 @@ class DeckParser:
         return EDHDeck(
             name=deck_data["name"],
             format=deck_data["format"],
-            formatRules=deck_data["formatRules"],
             cards=cards,
             commander=commander,
         )
@@ -206,7 +206,7 @@ class DeckParser:
             # Iterate through the JSON data
             for entry in json_data:
                 # Check if the 'name' field matches any of the target names
-                if entry.get("name") in target_names:
+                if entry.get("name", "") in target_names:
                     # Add the matching entry to the result dictionary
                     deckData[entry["name"]] = entry
                     # Remove the processed name from the target list
@@ -261,6 +261,7 @@ class DeckParser:
 
         for card_name, card_data in cardsDict.items():
             creature_type_match = regex_engine_type.search(card_data["type_line"])
+
             if creature_type_match:
                 cardType = creature_type_match.group("CardType")
                 creatureType = creature_type_match.group("CreatureType")
