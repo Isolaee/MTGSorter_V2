@@ -13,7 +13,7 @@ Not so simple plan is to:
 
 ## Tools
 - Tests: pyTest
-- Coding: black/flake8
+- Coding: black/flake8/ruff
 - Git: pre-commit/Git
 
 ## GUI
@@ -31,3 +31,9 @@ Not so simple plan is to:
 
 ## Diagrams are located in Schemas folder.
 - Deck & Card class diagram
+
+## Machine Learning
+The plan is to implement my old (rewritten) ML model to this software.
+These are some key points to remember.
+- Model often don't understand natural languages. This is why I need to make vector representation of my text. I made that with Word2Vec library. The Word2Vec model is trained on all MTG words. So it is higly spesific.
+- I have only small dataset, so the results will be highly inaccurate.

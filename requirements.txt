@@ -11,3 +11,4 @@
 # scikit-learn
 # gensim
 # nltk
+# Word2Vec
