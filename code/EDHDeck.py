@@ -144,8 +144,7 @@ class EDHDeck(MTGDeck):
             isValid = False
 
         # Check if the deck size is within the Decklimit
-
-        if len(self.cards) + 1 != self.formatRules.get("deck_size"):
+        if len(self.cards) != self.formatRules.get("deck_size"):
             formatCheckFails["Deck Size"] = (
                 f"Deck size is invalid. Deck has to be: {self.formatRules.get('deck_size')}"
             )
@@ -163,7 +162,18 @@ class EDHDeck(MTGDeck):
             isValid = False
 
         # Check singleton rule
-        singleton_exceptions = ["Plains", "Island", "Swamp", "Mountain", "Forest"]
+        singleton_exceptions = [
+            "Plains",
+            "Island",
+            "Swamp",
+            "Mountain",
+            "Forest",
+            "Snow-Covered Plains",
+            "Snow-Covered Island",
+            "Snow-Covered Swamp",
+            "Snow-Covered Mountain",
+            "Snow-Covered Forest",
+        ]
         duplicates = [
             item
             for item, count in Counter(self.getAllCardNames()).items()

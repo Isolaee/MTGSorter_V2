@@ -189,7 +189,6 @@ class DeckParser:
         """
         Find entries in a JSON file where the 'name' field matches any of the target strings
         and save the corresponding data in a dictionary. Remove processed names from the target list.
-
         Args:
             target_names (list): The names to search for.
 
@@ -202,16 +201,13 @@ class DeckParser:
         with open(file_path, "r", encoding="utf-8") as file:
             # Load the JSON data
             json_data = json.load(file)
-
             # Iterate through the JSON data
             for entry in json_data:
                 # Check if the 'name' field matches any of the target names
-                if entry.get("name", "") in target_names:
+                if entry.get("name") in target_names:
                     # Add the matching entry to the result dictionary
                     deckData[entry["name"]] = entry
-                    # Remove the processed name from the target list
 
-                # Stop if there are no more names to find
                 if not target_names:
                     break
 
@@ -260,6 +256,10 @@ class DeckParser:
         cardsDict = DeckParser.find_line_with_name(namesDict)
 
         for card_name, card_data in cardsDict.items():
+            if card_name not in namesDict:
+                print(f"Warning: '{card_name}' not found in namesDict. Skipping...")
+                continue  # Skip this card if it's not in namesDict
+
             creature_type_match = regex_engine_type.search(card_data["type_line"])
 
             if creature_type_match:
@@ -288,6 +288,7 @@ class DeckParser:
                 scryfallid=card_data.get("id"),
                 legalities=card_data.get("legalities"),
             )
+
             for _ in range(namesDict[card_name]["quantity"]):
                 cards.append(card)
 
