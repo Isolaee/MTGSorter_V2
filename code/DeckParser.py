@@ -209,8 +209,7 @@ class DeckParser:
                 if entry.get("name") in target_names:
                     # Add the matching entry to the result dictionary
                     deckData[entry["name"]] = entry
-                    # Remove the name from the target list
-                    target_names.remove(entry["name"])
+                    # Remove the processed name from the target list
 
                 # Stop if there are no more names to find
                 if not target_names:
@@ -234,7 +233,7 @@ class DeckParser:
                         raise ValueError(f"Invalid line format: {line.strip()}")
                     card_name = match.group("name").strip()
                     quantity = int(match.group("amount"))
-                    cardNames[i] = {"name": card_name, "quantity": quantity}
+                    cardNames[card_name] = {"quantity": quantity}
                     i += 1
                 except ValueError as e:
                     print(f"Error': {e}")
@@ -253,13 +252,14 @@ class DeckParser:
 
         cards: list = []
 
+        commander = commander_name
+
         namesDict = DeckParser.CreateDictkWithList(file_path, regex_engine_card)
 
         cardsDict = DeckParser.find_line_with_name(namesDict)
-        # print(cardsDict)
-        print("Creating deck. STEP 3")
-        for card in cardsDict.items():
-            creature_type_match = regex_engine_type.search(card["type_line"])
+
+        for card_name, card_data in cardsDict.items():
+            creature_type_match = regex_engine_type.search(card_data["type_line"])
             if creature_type_match:
                 cardType = creature_type_match.group("CardType")
                 creatureType = creature_type_match.group("CreatureType")
@@ -268,35 +268,34 @@ class DeckParser:
                 creatureType = ""  # Assign a default value for creatureType
 
             card = MTGCard(
-                name=card.get("name"),
-                manacost=card.get("mana_cost"),
-                cmc=card.get("cmc"),
-                colors=card.get("colors"),
-                power=card.get("power"),
-                toughness=card.get("toughness"),
-                oracleText=card.get("oracle_text"),
-                loyalty=card.get("loyalty"),
+                name=card_data.get("name"),
+                manacost=card_data.get("mana_cost"),
+                cmc=card_data.get("cmc"),
+                colors=card_data.get("colors"),
+                power=card_data.get("power", "N/A"),
+                toughness=card_data.get("toughness", "N/A"),
+                oracleText=card_data.get("oracle_text", "No Oracle Text"),
+                loyalty=card_data.get("loyalty", "N/A"),
                 typeline=creatureType,
                 cardType=cardType,
-                cardFaces=card.get("card_faces"),
-                allParts=card.get("all_parts"),
-                layout=card.get("layout"),
-                artist=card.get("artist"),
-                scryfallid=card.get("id"),
-                legalities="Commander",
+                cardFaces=card_data.get("card_faces"),
+                allParts=card_data.get("all_parts"),
+                layout=card_data.get("layout"),
+                artist=card_data.get("artist"),
+                scryfallid=card_data.get("id"),
+                legalities=card_data.get("legalities"),
             )
-            for _ in range(namesDict[card]["quantity"]):
+            for _ in range(namesDict[card_name]["quantity"]):
                 cards.append(card)
 
-        print(
-            "Deck created. STEP 4 Return",
-        )
+            if card_data.get("name") == commander_name:
+                commander = card
+
         deck = EDHDeck(
             name=deck_name,
             format="Commander",
             formatRules=["Singleton", "100 cards"],
             cards=cards,
-            commander=commander_name,
+            commander=commander,
         )
-        print(deck.getAllCardNames())
         return deck
