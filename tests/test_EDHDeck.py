@@ -39,5 +39,26 @@ def test_get_format_other():
 
     assert result == deck_format, f"Expected {deck_format}, but got {result}"
 
-def test_get_format_rules_invalid():
-    pass
+def test_get_Cards_valid():
+    deck_cards = ["Card1", "Card2", "Card3"]
+    deck = EDHDeck(name="Test Deck", format="Commander", cards=deck_cards, commander=None)
+
+    result = deck.getCards()
+
+    assert result == deck_cards, f"Expected {deck_cards}, but got {result}"
+    
+def test_get_Cards_noCards():
+    deck_cards = []
+    deck = EDHDeck(name="Test Deck", format="Commander", cards=deck_cards, commander=None)
+
+    result = deck.getCards()
+
+    assert result == deck_cards, f"Expected {deck_cards}, but got {result}"
+
+def get_commander_valid():
+    commander = "CommanderCard"
+    deck = EDHDeck(name="Test Deck", format="Commander", cards=[], commander=commander)
+
+    result = deck.getCommander()
+
+    assert result == commander, f"Expected {commander}, but got {result}"
