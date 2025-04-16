@@ -1,4 +1,4 @@
-from PlayingCard import PlayingCard
+from .PlayingCard import PlayingCard
 from typing import List
 
 

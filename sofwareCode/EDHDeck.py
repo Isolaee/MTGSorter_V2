@@ -1,6 +1,7 @@
-from MTGDeck import MTGDeck
-from MTGCard import MTGCard
+from .MTGDeck import MTGDeck
+from .MTGCard import MTGCard
 from collections import Counter
+from typing import Tuple, Dict
 
 
 class EDHDeck(MTGDeck):
@@ -133,7 +134,7 @@ class EDHDeck(MTGDeck):
     def getHistogramData(self, histogramType):
         return super().getHistogramData(histogramType)
 
-    def enforceFormatRules(self) -> tuple[bool, dict]:
+    def enforceFormatRules(self) -> Tuple[bool, Dict]:
         """Enforce the format rules for the deck."""
         formatCheckFails: dict = {}
         isValid: bool = True

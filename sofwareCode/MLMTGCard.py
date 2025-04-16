@@ -1,4 +1,4 @@
-from MTGCard import MTGCard
+from .MTGCard import MTGCard
 
 
 class MLMTGCard(MTGCard):

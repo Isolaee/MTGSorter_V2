@@ -1,5 +1,5 @@
-from EDHDeck import EDHDeck
-from MTGCard import MTGCard
+from .EDHDeck import EDHDeck
+from .MTGCard import MTGCard
 from pathlib import Path
 import json
 

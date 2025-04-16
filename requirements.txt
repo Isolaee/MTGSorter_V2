@@ -5,6 +5,7 @@
 # Black       -25.1.0
 # Pre-commit   -4.0.1
 # PyTest
+# pytest-cov
 # Matplotlib
 # Pandas
 # Tensorflow

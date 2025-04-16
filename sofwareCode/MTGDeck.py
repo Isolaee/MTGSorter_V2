@@ -1,16 +1,12 @@
 from typing import TypeVar
-from MTGCard import MTGCard  # Assuming MTGCard inherits from PlayingCard
-from Deck import Deck
+from .MTGCard import MTGCard
+from .Deck import Deck
 from abc import ABC, abstractmethod
-
-# Define a TypeVar for the card type
-T = TypeVar("T", bound=MTGCard)  # T must be a subclass of PlayingCard
-
 
 class MTGDeck(Deck, ABC):
     """Class representing a deck of Magic: The Gathering cards."""
 
-    def __init__(self, name: str, cards: list[T]) -> None:
+    def __init__(self, name: str, cards: list) -> None:
         super().__init__(name)
         self.name = name
         self.cards: list = cards
@@ -33,7 +29,7 @@ class MTGDeck(Deck, ABC):
         random.shuffle(self.cards)
 
     @abstractmethod
-    def draw_card(self) -> T:
+    def draw_card(self):
         """Draw a card from the top of the deck."""
         if self.cards:
             return self.cards.pop(0)

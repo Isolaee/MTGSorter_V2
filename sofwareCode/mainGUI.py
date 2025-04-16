@@ -1,6 +1,6 @@
 # Import GUI (JarAPp)
 from appJar import gui
-from DeckParser import DeckParser
+from .DeckParser import DeckParser
 import re
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg

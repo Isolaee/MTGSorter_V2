@@ -51,3 +51,10 @@ Today I imported some of my old code regarding vectorizing code and wrote class 
 # TODO: Tests
 I still haven't wrote any tests. That is something I need to do.
 </details>
+
+<details>
+<summary>16/04</summary>
+
+# Tests
+Today is the time to write tests. My strategy is to write test to "critical path".
+As I said I am using PyTest. Tests are located in tests foldel.
