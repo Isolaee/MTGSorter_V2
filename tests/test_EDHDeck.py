@@ -6,6 +6,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 import pytest
 from softwareCode.EDHDeck import EDHDeck
 
+from unittest.mock import Mock, patch
+
 
 def test_get_name_valid():
     deck_name = "Test Deck"
