@@ -1,7 +1,8 @@
 from .MLMTGCard import MLMTGCard
 from .Word2Vec import Word2Vec as W2V
 
-class MLDataTools():
+
+class MLDataTools:
     """
     A class to handle data preprocessing for machine learning tasks.
     """

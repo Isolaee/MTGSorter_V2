@@ -38,3 +38,6 @@ def test_get_format_other():
     result = deck.getFormat()
 
     assert result == deck_format, f"Expected {deck_format}, but got {result}"
+
+def test_get_format_rules_invalid():
+    pass

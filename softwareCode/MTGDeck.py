@@ -1,7 +1,6 @@
-from typing import TypeVar
-from .MTGCard import MTGCard
 from .Deck import Deck
 from abc import ABC, abstractmethod
+
 
 class MTGDeck(Deck, ABC):
     """Class representing a deck of Magic: The Gathering cards."""
@@ -88,7 +87,9 @@ class MTGDeck(Deck, ABC):
             "commander": (
                 self.commander
                 if isinstance(self.commander, str)
-                else self.commander.to_dict() if self.commander else None
+                else self.commander.to_dict()
+                if self.commander
+                else None
             ),
             "cards": [card.to_dict() for card in self.cards],
         }

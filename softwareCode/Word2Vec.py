@@ -93,7 +93,9 @@ def main(json_file, model_file):
     save_model(model, model_file)
 
 
-def getWordSimilarity(word1, word2, model=Word2Vec.load("word2vec.model")):
+def getWordSimilarity(
+    word1, word2, model=Word2Vec.load("MLDataAndModels/word2vec.model")
+):
     """
     This method returns similarity of given words in vector format.
     Params: Word1 and Word2
@@ -104,7 +106,7 @@ def getWordSimilarity(word1, word2, model=Word2Vec.load("word2vec.model")):
     return model.wv.similarity(word1, word2)
 
 
-def getWordVec(Word, model=Word2Vec.load("word2vec.model")):
+def getWordVec(Word, model=Word2Vec.load("MLDataAndModels/word2vec.model")):
     """
     Method for getting vector of a single word
     Params: str Word, word you need vector of.
@@ -115,11 +117,11 @@ def getWordVec(Word, model=Word2Vec.load("word2vec.model")):
     return model.wv[Word]
 
 
-def getSentenceVector(sentence, model=Word2Vec.load("word2vec.model")):
+def getSentenceVector(sentence, model=Word2Vec.load("MLDataAndModels/word2vec.model")):
     """
     Method for sentence vectorizing.
     Params: sentence-> sentenco to get vector from,
-    model-> word model, defaults to model=Word2Vec.load('word2vec.model')
+    model-> word model, defaults to model=Word2Vec.load('MLDataAndModels/word2vec.model')
     Returns: Vector
     """
     cond = None
@@ -135,8 +137,8 @@ def getSentenceVector(sentence, model=Word2Vec.load("word2vec.model")):
 
 
 # Example usage
-json_file = "Word2VecData.json"  # Replace with your JSON file path
-model_file = "word2vec.model"  # Replace with your desired model file name
+# json_file = "Word2VecData.json"  # Replace with your JSON file path
+# model_file = "word2vec.model"  # Replace with your desired model file name
 
 # This file is to create word2vec.model, if model already exist, there is no reason to run this.
-main(json_file, model_file)
+# main(json_file, model_file)

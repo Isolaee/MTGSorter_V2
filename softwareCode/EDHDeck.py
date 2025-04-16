@@ -149,9 +149,9 @@ class EDHDeck(MTGDeck):
 
         # Check if the deck size is within the Decklimit
         if len(self.cards) != self.formatRules.get("deck_size"):
-            formatCheckFails["Deck Size"] = (
-                f"Deck size is invalid. Deck has to be: {self.formatRules.get('deck_size')}"
-            )
+            formatCheckFails[
+                "Deck Size"
+            ] = f"Deck size is invalid. Deck has to be: {self.formatRules.get('deck_size')}"
             isValid = False
         else:
             len(self.cards) == self.formatRules.get("deck_size")
@@ -160,9 +160,9 @@ class EDHDeck(MTGDeck):
         # Check if contains banned cards
         overlap = set(self.getAllCardNames()) & set(self.formatRules.get("banned_cards"))
         if overlap:
-            formatCheckFails["Banned Cards"] = (
-                f"Contains banned cards: {', '.join(overlap)}"
-            )
+            formatCheckFails[
+                "Banned Cards"
+            ] = f"Contains banned cards: {', '.join(overlap)}"
             isValid = False
 
         # Check singleton rule
@@ -184,9 +184,9 @@ class EDHDeck(MTGDeck):
             if count > 1 and item not in singleton_exceptions
         ]
         if duplicates:
-            formatCheckFails["Singleton"] = (
-                f"Contains duplicates: {', '.join(duplicates)}"
-            )
+            formatCheckFails[
+                "Singleton"
+            ] = f"Contains duplicates: {', '.join(duplicates)}"
             isValid = False
 
         # Check color identity rule
@@ -197,9 +197,9 @@ class EDHDeck(MTGDeck):
             if not set(card.getColorIdentity()).issubset(commander_color_identity)
         ]
         if invalid_cards:
-            formatCheckFails["Color Identity"] = (
-                f"Cards with invalid color identity: {', '.join(invalid_cards)}"
-            )
+            formatCheckFails[
+                "Color Identity"
+            ] = f"Cards with invalid color identity: {', '.join(invalid_cards)}"
             isValid = False
 
         return isValid, formatCheckFails
