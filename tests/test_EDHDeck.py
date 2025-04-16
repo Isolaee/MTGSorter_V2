@@ -7,14 +7,18 @@ import pytest
 from sofwareCode.EDHDeck import EDHDeck
 
 
-def test_get_name():
-    # Arrange: Create an instance of EDHDeck with a specific name
+def test_get_name_valid():
     deck_name = "Test Deck"
     deck = EDHDeck(name=deck_name, format="Commander", cards=[], commander=None)
 
-    # Act: Call the getName() method
     result = deck.getName()
 
-    # Assert: Verify that the result matches the expected name
     assert result == deck_name, f"Expected {deck_name}, but got {result}"
 
+def test_get_name_empty():
+    empty_deck_name = ""
+    deck = EDHDeck(name=empty_deck_name, format="Commander", cards=[], commander=None)
+
+    result = deck.getName()
+
+    assert result == "Unnamed Deck", f"Expected empty string, but got {result}"

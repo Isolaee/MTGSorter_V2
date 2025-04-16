@@ -80,6 +80,9 @@ class EDHDeck(MTGDeck):
 
     def getName(self) -> str:
         """Return the name of the deck."""
+        if self.name == "":
+            return "Unnamed Deck"
+
         return self.name
 
     def getFormat(self) -> str:
