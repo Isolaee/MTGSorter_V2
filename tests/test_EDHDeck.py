@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 
 import pytest
-from sofwareCode.EDHDeck import EDHDeck
+from softwareCode.EDHDeck import EDHDeck
 
 
 def test_get_name_valid():
@@ -22,3 +22,19 @@ def test_get_name_empty():
     result = deck.getName()
 
     assert result == "Unnamed Deck", f"Expected empty string, but got {result}"
+
+def test_get_format_Commander():
+    deck_format = "Commander"
+    deck = EDHDeck(name="Test Deck", format=deck_format, cards=[], commander=None)
+
+    result = deck.getFormat()
+
+    assert result == deck_format, f"Expected {deck_format}, but got {result}"
+
+def test_get_format_other():
+    deck_format = "Standard"
+    deck = EDHDeck(name="Test Deck", format=deck_format, cards=[], commander=None)
+
+    result = deck.getFormat()
+
+    assert result == deck_format, f"Expected {deck_format}, but got {result}"
