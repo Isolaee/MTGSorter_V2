@@ -5,8 +5,8 @@
 ###########################
 
 # Imports
-import mainGUI
+from .mainGUI import startGUI
 
 
 # Start the GUI application with the regex engine
-mainGUI.startGUI()
+startGUI()

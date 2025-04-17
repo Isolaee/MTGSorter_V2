@@ -12,6 +12,7 @@ from .MTGCard import MTGCard
 # Utility imports
 from .DeckParser import DeckParser
 
+
 # Explicitly define what is exported when using `from softwareCode import *`
 __all__ = [
     "Deck",
