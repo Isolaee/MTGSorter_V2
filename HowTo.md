@@ -1,12 +1,12 @@
 ### This document is guide how to use this software
 
 <details>
-<summary>Start<summary>
+<summary>Start</summary>
 Currently these is no executable file. You can run program from root with "python -m softwareCode.app", or from enywhere with proper path.
 </details>
 
 <details>
-<sumary>Usage<summary>
+<sumary>Usage</summary>
 The software GUI can be divided in thee sections.
 - Deckload -> loading new deck from txt
 - Deckview -> Seeing Deck Data
@@ -24,7 +24,7 @@ On the bottom, you can see saved decks, and button for saving your active deck. 
 </details>
 
 <details>
-<summary>Future?<summary>
+<summary>Future?</summary>
 There are two concrete updates that I want to do.
 1. Get the ML part working in software.
 2. While you have active deck, seeing the card image from request.
