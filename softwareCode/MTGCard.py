@@ -24,6 +24,7 @@ class MTGCard(PlayingCard):
         artist: str,
         scryfallid: int,
         legalities: str,
+        image: str,
     ) -> None:
 
         super().__init__(name, legalities)
@@ -44,6 +45,7 @@ class MTGCard(PlayingCard):
         self.artist = artist
         self.scryfallid = scryfallid
         self.legalities = legalities
+        self.image = image
 
     def getName(self) -> str:
         """Return the name of the card."""
@@ -140,4 +142,15 @@ class MTGCard(PlayingCard):
             "artist": self.artist,
             "scryfallid": self.scryfallid,
             "legalities": self.legalities,
+            "image": self.image,
         }
+
+    def getImage(self) -> str:
+        """Return the image PNG of the card."""
+        cond = None
+        if not cond:
+            value = self.image
+        else:
+            value = "Card Not Found"
+
+        return value

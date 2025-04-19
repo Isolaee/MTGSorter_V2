@@ -287,6 +287,7 @@ class DeckParser:
                 artist=card_data.get("artist"),
                 scryfallid=card_data.get("id"),
                 legalities=card_data.get("legalities"),
+                image=card_data.get("image_uris", {}).get("normal", None),
             )
 
             for _ in range(namesDict[card_name]["quantity"]):

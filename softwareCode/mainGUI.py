@@ -5,6 +5,9 @@ import re
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
+import requests
+import os
+from PIL import Image, ImageTk
 
 
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
@@ -100,18 +103,16 @@ def updateGraphCanvas(data):
     Args:
         data (dict): A dictionary containing the data for the graph.
     """
+    # Get the tkinter Canvas object from appJar
+    canvas = app.getCanvas("GraphCanvas")
 
-    # Ensure keys and values are integers
-    data = {key: value for key, value in data.items()}
-
-    # Clear the existing graph from the canvas
-    for widget in app.getCanvas("GraphCanvas").winfo_children():
-        widget.destroy()
+    # Clear the canvas before adding a new graph
+    canvas.delete("all")
 
     # Create a Matplotlib figure
     fig, ax = plt.subplots(figsize=(5, 4))
 
-    # Example: Create a bar chart from the data
+    # Plot the data
     ax.bar(data.keys(), data.values(), color="skyblue")
     ax.set_title("Card Data")
     ax.set_xlabel("Categories")
@@ -121,9 +122,9 @@ def updateGraphCanvas(data):
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Embed the figure into the AppJar canvas
-    canvas = FigureCanvasTkAgg(fig, app.getCanvas("GraphCanvas"))
-    canvas.draw()
-    canvas.get_tk_widget().pack()
+    canvas_widget = FigureCanvasTkAgg(fig, canvas)
+    canvas_widget.draw()
+    canvas_widget.get_tk_widget().pack()
 
 
 # Start GUI func
@@ -187,7 +188,65 @@ def loadDeckByClick(clickedDeck):
 def getSelectedItemFromDeck(clickedItem):
     """Get the selected item from the DeckPreview list box."""
     selected_item = app.getListBox(clickedItem)
-    print(selected_item)
+    selected_card_name = selected_item[0].split("x ", 1)[
+        -1
+    ]  # Extract card name, it has 1, x, [, ], '
+
+    selected_card = None
+    for card in currentDeck.cards:
+        if card.getName() == selected_card_name:
+            selected_card = card
+            break
+
+    # Just in case the card is not found in the deck. This should not happen.
+    if not selected_card:
+        print(f"Card '{selected_card_name}' not found in the deck.")
+        return
+
+    image_url = selected_card.getImage()
+    response = requests.get(image_url)
+
+    if response.status_code == 200:
+        # Construct the path to the TempImg folder inside softwareCode
+        temp_img_dir = os.path.join(os.path.dirname(__file__), "TempImg")
+        os.makedirs(temp_img_dir, exist_ok=True)  # Create the folder if it doesn't exist
+
+        # Save the image as a temporary .JPG file
+        jpg_image_path = os.path.join(temp_img_dir, "selected_card.jpg")
+        with open(jpg_image_path, "wb") as file:
+            file.write(response.content)
+
+        # Get the tkinter Canvas object from appJar
+        canvas = app.getCanvas("GraphCanvas")
+
+        # Get the canvas size
+        canvas.update_idletasks()  # Ensure the canvas size is updated
+        canvas_width = canvas.winfo_width()
+        canvas_height = canvas.winfo_height()
+
+        # Convert the .JPG image to a format compatible with tkinter
+        with Image.open(jpg_image_path) as img:
+            # Calculate the new width to maintain the aspect ratio
+            aspect_ratio = img.width / img.height
+            new_height = canvas_height
+            new_width = int(new_height * aspect_ratio)
+
+            # Resize the image
+            img = img.resize((new_width, new_height))
+            tk_image = ImageTk.PhotoImage(img)
+
+        # Clear the canvas before adding a new image
+        canvas.delete("all")
+
+        # Add the image to the canvas, centered
+        canvas.create_image(
+            canvas_width // 2, canvas_height // 2, image=tk_image, anchor="center"
+        )
+        canvas.image = tk_image  # Keep a reference to avoid garbage collection
+    else:
+        print(
+            f"Failed to retrieve image from {image_url}. Status code: {response.status_code}"
+        )
 
 
 ### GUI
