@@ -184,6 +184,12 @@ def loadDeckByClick(clickedDeck):
             print(f"Error loading deck: {e}")
 
 
+def getSelectedItemFromDeck(clickedItem):
+    """Get the selected item from the DeckPreview list box."""
+    selected_item = app.getListBox(clickedItem)
+    print(selected_item)
+
+
 ### GUI
 app = gui("MTGDeckStats")
 app.setResizable(canResize=True)
@@ -218,7 +224,7 @@ app.addButton("Load", press)
 app.startPanedFrame("Data")
 # Deck Preview window.
 app.addListBox("DeckPreview")
-app.setListBoxChangeFunction("DeckPreview", showCardIMG)
+app.setListBoxChangeFunction("DeckPreview", getSelectedItemFromDeck)
 
 ### Right window
 app.startPanedFrame("Graphs")
