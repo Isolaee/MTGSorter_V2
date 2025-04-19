@@ -58,3 +58,15 @@ I still haven't wrote any tests. That is something I need to do.
 # Tests
 Today is the time to write tests. My strategy is to write test to "critical path".
 As I said I am using PyTest. Tests are located in tests foldel.
+</details>
+
+<details>
+<summary>19/04</summary>
+
+# Card images
+I value the card Image feature because, there is over 40 000 unique cards in MTG and it's fools errand trying to remember them all. Having access to card image is vital when pondering about your deck. So it is very user friendly feature.
+I implemented this as follow.
+In my data, I have link to Scryfall so when creating card obj, it fetches the link.
+And in software when you click that card in deck prewiev, it dynamicly fetches that image and temporarily saves it and shows it.
+This way There is no massive card image database in software.
+</details>
