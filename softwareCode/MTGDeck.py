@@ -35,6 +35,7 @@ class MTGDeck(Deck, ABC):
         else:
             raise ValueError("The deck is empty.")
 
+    @abstractmethod
     def getAllCardNames(self):
         """Return a list of all card names in the deck."""
         return [card.getName() for card in self.cards]
