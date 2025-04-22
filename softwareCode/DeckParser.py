@@ -298,7 +298,7 @@ class DeckParser:
 
         deck = EDHDeck(
             name=deck_name,
-            format="Commander",
+            format="commander",
             cards=cards,
             commander=commander,
         )

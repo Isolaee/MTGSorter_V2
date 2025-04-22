@@ -11,57 +11,6 @@ class EDHDeck(MTGDeck):
         "commander": True,
         "deck_size": 100,
         "singleton": True,
-        "banned_cards": [
-            "Ancestral Recall",
-            "Balance",
-            "Biorhythm",
-            "Black Lotus",
-            "Braids, Cabal Minion",
-            "Chaos Orb",
-            "Coalition Victory",
-            "Channel",
-            "Dockside Extortionist",
-            "Emrakul, the Aeons Torn",
-            "Erayo, Soratami Ascendant",
-            "Falling Star",
-            "Fastbond",
-            "Flash",
-            "Gifts Ungiven",
-            "Golos, Tireless Pilgrim",
-            "Griselbrand",
-            "Hullbreacher",
-            "Iona, Shield of Emeria",
-            "Karakas",
-            "Jeweled Lotus",
-            "Leovold, Emissary of Trest",
-            "Library of Alexandria",
-            "Limited Resources",
-            "Lutri, the Spellchaser",
-            "Mana Crypt",
-            "Mox Emerald",
-            "Mox Jet",
-            "Mox Pearl",
-            "Mox Ruby",
-            "Mox Sapphire",
-            "Nadu, Winged Wisdom",
-            "Panoptic Mirror",
-            "Paradox Engine",
-            "Primeval Titan",
-            "Prophet of Kruphix",
-            "Recurring Nightmare",
-            "Rofellos, Llanowar Emissary",
-            "Shahrazad",
-            "Sundering Titan",
-            "Sway of the Stars",
-            "Sylvan Primordial",
-            "Time Vault",
-            "Time Walk",
-            "Tinker",
-            "Tolarian Academy",
-            "Trade Secrets",
-            "Upheaval",
-            "Yawgmoth's Bargain",
-        ],
         "color_identity": True,
     }
 
@@ -157,13 +106,16 @@ class EDHDeck(MTGDeck):
             len(self.cards) == self.formatRules.get("deck_size")
             pass
 
-        # Check if contains banned cards
-        overlap = set(self.getAllCardNames()) & set(self.formatRules.get("banned_cards"))
-        if overlap:
-            formatCheckFails[
-                "Banned Cards"
-            ] = f"Contains banned cards: {', '.join(overlap)}"
-            isValid = False
+        # Check if contains banned cards using legalities attribute
+        for card in self.cards:
+            legalities = card.getLegalities()
+
+            # Check if the card is legal in the deck's format
+            if legalities.get(self.getFormat()) != "legal":
+                formatCheckFails[
+                    "Banned Cards"
+                ] = f"Contains banned cards: {card.getName()}"
+                isValid = False
 
         # Check singleton rule
         singleton_exceptions = [
