@@ -274,6 +274,10 @@ def saveCurrentDeck():
     populateSavedDecks()
 
 
+def searchCard():
+    pass  # Implement the search card functionality here
+
+
 def goToPage(page):
     """Switch to the specified page."""
     app.hideFrame("WelcomePage")
@@ -365,6 +369,10 @@ app.addButton(
     "BackToWelcomeFromCreateDeck", lambda: goToPage("WelcomePage"), row=1, column=0
 )
 app.setButton("BackToWelcomeFromCreateDeck", "Back")
+
+app.addLabel("SearchLabel", "Search for a card:", row=2, column=0)
+app.addEntry("SearchField", row=3, column=0)  # Typing field
+app.addButton("Search", lambda: searchCard(), row=3, column=1)  # Search button
 app.stopFrame()
 
 ### --------------------------------------------------------------------------------
