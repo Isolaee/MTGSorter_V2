@@ -5,10 +5,8 @@ class PioneerDeck(MTGDeck):
     """Class representing a Commander (EDH) deck of Magic: The Gathering cards."""
 
     formatRules: dict = {
-        "commander": False,
         "deck_size": 60,
         "singleton": False,
-        "color_identity": False,
     }
 
     def __init__(
