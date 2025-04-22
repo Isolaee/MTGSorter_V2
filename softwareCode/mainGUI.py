@@ -249,6 +249,41 @@ def getSelectedItemFromDeck(clickedItem):
         )
 
 
+def populateSavedDecks():
+    """
+    Populate the Saved Decks list box with the contents of the saved decks folder
+    and adjust its size to fit the content.
+    """
+    app.clearListBox("SavedDecks")
+    saved_decks = list(
+        DeckParser.read_folder_contents(saved_decks_path)
+    )  # Convert generator to list
+    app.addListItems("SavedDecks", saved_decks)
+
+    # Dynamically adjust the size of the listbox
+    num_rows = len(saved_decks)
+    app.setListBoxRows("SavedDecks", num_rows if num_rows > 0 else 1)  # At least 1 row
+
+
+## Save deck
+def saveCurrentDeck():
+    """Save the current deck to a file."""
+    cond = None
+    if currentDeck != cond:
+        DeckParser.serializeDeck(currentDeck)
+    populateSavedDecks()
+
+
+def goToPage(page):
+    """Switch to the specified page."""
+    app.hideFrame("WelcomePage")
+    app.hideFrame("LoadDeckPage")
+    app.hideFrame("CreateDeckPage")
+    app.showFrame(page)
+
+
+### --------------------------------------------------------------------------------
+### Global variables
 ### GUI
 app = gui("MTGDeckStats")
 app.setResizable(canResize=True)
@@ -259,6 +294,23 @@ app.setStretch("column")
 app.addLabel("title", "Welcome to MTGDeckStats")
 app.setBg("lightblue")
 app.setFont(20)
+
+### --------------------------------------------------------------------------------
+# Page 1: Welcome Page
+app.startFrame("WelcomePage", row=0, column=0)
+app.addLabel("welcomeLabel", "Welcome to the MTGDeckStats", colspan=2)
+app.addButton("Load Deck", lambda: goToPage("LoadDeckPage"), row=1, column=0)
+app.addButton("Create Deck", lambda: goToPage("CreateDeckPage"), row=1, column=1)
+app.stopFrame()
+
+### --------------------------------------------------------------------------------
+# Load Deck Page
+app.startFrame("LoadDeckPage", row=0, column=0)
+app.addLabel("page2Label", "Load Deck")
+app.addButton(
+    "BackToWelcomeFromLoadDeck", lambda: goToPage("WelcomePage"), row=1, column=0
+)
+app.setButton("BackToWelcomeFromLoadDeck", "Back")
 
 # Menu
 fileMenus = ["Close"]
@@ -296,32 +348,6 @@ app.addMenuList("Data", dataMenu, dataMenuControls)
 app.stopPanedFrame()
 app.stopPanedFrame()
 
-
-def populateSavedDecks():
-    """
-    Populate the Saved Decks list box with the contents of the saved decks folder
-    and adjust its size to fit the content.
-    """
-    app.clearListBox("SavedDecks")
-    saved_decks = list(
-        DeckParser.read_folder_contents(saved_decks_path)
-    )  # Convert generator to list
-    app.addListItems("SavedDecks", saved_decks)
-
-    # Dynamically adjust the size of the listbox
-    num_rows = len(saved_decks)
-    app.setListBoxRows("SavedDecks", num_rows if num_rows > 0 else 1)  # At least 1 row
-
-
-## Save deck
-def saveCurrentDeck():
-    """Save the current deck to a file."""
-    cond = None
-    if currentDeck != cond:
-        DeckParser.serializeDeck(currentDeck)
-    populateSavedDecks()
-
-
 # Add Saved Decks section
 app.addLabel("SavedDecksLabel", "Saved Decks")
 app.addListBox("SavedDecks", [])
@@ -329,3 +355,18 @@ app.setListBoxChangeFunction("SavedDecks", loadDeckByClick)
 populateSavedDecks()
 
 app.addButton("Save Deck", saveCurrentDeck)
+app.stopFrame()
+
+### --------------------------------------------------------------------------------
+# Create Deck Page
+app.startFrame("CreateDeckPage", row=0, column=0)
+app.addLabel("page3Label", "Create Deck")
+app.addButton(
+    "BackToWelcomeFromCreateDeck", lambda: goToPage("WelcomePage"), row=1, column=0
+)
+app.setButton("BackToWelcomeFromCreateDeck", "Back")
+app.stopFrame()
+
+### --------------------------------------------------------------------------------
+app.hideFrame("LoadDeckPage")  # Hide the LoadDeckPage by default
+app.hideFrame("CreateDeckPage")  # Hide the CreateDeckPage by default
