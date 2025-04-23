@@ -368,8 +368,8 @@ def searchCard():
 
 
 def updateDraftDeckList():
-    app.clearListBox("DraftDeckList")
-    app.addListItem("DraftDeckList", "Draft Deck")
+    item = getSelectedItemFromListBox("DraftDeckList")
+    showCardImage(item, "ImageCanvas")
 
 
 def goToPage(page):
@@ -480,9 +480,9 @@ app.setListBoxChangeFunction(
 app.startPanedFrame("DeckBuilding", row=4, column=0)
 app.addLabel("DeckBuildingLabel", "Deck Building")
 app.addListBox("DraftDeckList", [])
-# app.setListBoxChangeFunction(
-#     "DraftDeckList", updateDraftDeckList
-# )  # List box for deck building
+app.setListBoxChangeFunction(
+    "DraftDeckList", updateDraftDeckList
+)  # List box for deck building
 app.startPanedFrame("Canvas", row=4, column=0)
 app.addCanvas("ImageCanvas", row=4, column=0)  # Canvas for card image
 
