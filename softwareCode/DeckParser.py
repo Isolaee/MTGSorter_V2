@@ -310,3 +310,43 @@ class DeckParser:
             raise ValueError(error)
 
         return deck
+
+    @staticmethod
+    def CreateSingleMTGCard(card_name) -> MTGCard:
+        """
+        Create a single MTGCard object with proper values.
+        Returns a MTGCard object.
+        """
+        ScryData = "Data\\ScryfallCardData13_04_2025.json"
+        with open(ScryData, "r", encoding="utf-8") as scryfall_file:
+            scryfall_data = json.load(scryfall_file)
+
+            # Find card data in Scryfall JSON
+            card_data = next(
+                (card for card in scryfall_data if card["name"] == card_name), None
+            )
+            if not card_data:
+                raise ValueError(f"Card '{card_name}' not found in Scryfall data.")
+
+            card = MTGCard(
+                name=card_name,
+                manacost=card_data.get("mana_cost"),
+                cmc=card_data.get("cmc"),
+                colors=card_data.get("colors"),
+                colorIdentity=card_data.get("color_identity"),
+                power=card_data.get("power"),
+                toughness=card_data.get("toughness"),
+                oracleText=card_data.get("oracle_text"),
+                loyalty=card_data.get("loyalty"),
+                typeline=card_data.get("type_line"),
+                cardType=card_data.get("type_line"),
+                cardFaces=card_data.get("card_faces"),
+                allParts=card_data.get("all_parts"),
+                layout=card_data.get("layout"),
+                artist=card_data.get("artist"),
+                scryfallid=card_data.get("id"),
+                legalities="Commander",
+                image=card_data.get("image_uris", {}).get("normal"),
+            )
+
+        return card

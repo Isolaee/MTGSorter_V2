@@ -13,6 +13,7 @@ from PIL import Image, ImageTk
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
 regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
 saved_decks_path = "./Decks"  # Path to the folder containing saved decks
+draft_deck = None  # Placeholder for the draft deck
 
 
 def press(btn):
@@ -151,20 +152,6 @@ def menuControls(item):
         app.stop()
 
 
-def showCardIMG(clickedCard):
-    """
-    Show the card image in the DeckPreview list box.
-
-    Args:
-        card_name (str): The name of the card to show.
-    """
-    # selected_items = app.getListBox(clickedCard)
-    # print(f"Selected items: {selected_items}")
-    ### Find the card and show its image in grpah canvas
-    # TODO: Implement the logic to show the card image in the graph canvas
-    # Problem: Scryfall provides a static URL for the card image, but we need to find a way to display it in the app.
-
-
 def loadDeckByClick(clickedDeck):
     """
     Load the deck by clicking on the list box.
@@ -185,12 +172,105 @@ def loadDeckByClick(clickedDeck):
             print(f"Error loading deck: {e}")
 
 
+def getSelectedItemFromListBox(clickedItem):
+    """
+    Get the selected item from the list box.
+
+    Args:
+        clickedItem (str): The name of the clicked item.
+    Returns:
+
+    """
+    selected_item = app.getListBox(clickedItem)
+    if selected_item:
+        selected_card_name = selected_item[0].split("x ", 1)[-1]
+        return selected_card_name
+    return None
+
+
+def showCardImage(card_name, canvas):
+    """
+    Show the image of the selected card to Selected Canvas.
+
+    Args:
+        card_name (str): The name of the card.
+        canvas (tkinter.Canvas): The canvas to display the image on.
+    Returns:
+        None
+    """
+    # card = getSelectedItemFromListBox()
+    print(f"Selected card in ShowCardImage: {card_name}")  # Debugging line
+    image_url = card_name.getImage()
+    response = requests.get(image_url)
+
+    if response.status_code == 200:
+        # Construct the path to the TempImg folder inside softwareCode
+        temp_img_dir = os.path.join(os.path.dirname(__file__), "TempImg")
+        os.makedirs(temp_img_dir, exist_ok=True)  # Create the folder if it doesn't exist
+
+        # Save the image as a temporary .JPG file
+        jpg_image_path = os.path.join(temp_img_dir, "selected_card.jpg")
+        with open(jpg_image_path, "wb") as file:
+            file.write(response.content)
+
+        # Get the tkinter Canvas object from appJar
+        canvas = app.getCanvas("GraphCanvas")
+
+        # Get the canvas size
+        canvas.update_idletasks()  # Ensure the canvas size is updated
+        canvas_width = canvas.winfo_width()
+        canvas_height = canvas.winfo_height()
+
+        # Convert the .JPG image to a format compatible with tkinter
+        with Image.open(jpg_image_path) as img:
+            # Calculate the new width to maintain the aspect ratio
+            aspect_ratio = img.width / img.height
+            new_height = canvas_height
+            new_width = int(new_height * aspect_ratio)
+
+            # Resize the image
+            img = img.resize((new_width, new_height))
+            tk_image = ImageTk.PhotoImage(img)
+
+        # Clear the canvas before adding a new image
+        canvas.delete("all")
+
+        # Add the image to the canvas, centered
+        canvas.create_image(
+            canvas_width // 2, canvas_height // 2, image=tk_image, anchor="center"
+        )
+        canvas.image = tk_image  # Keep a reference to avoid garbage collection
+    else:
+        print(
+            f"Failed to retrieve image from {image_url}. Status code: {response.status_code}"
+        )
+
+
+def updateSearchResultsList():
+    """
+    Update the SearchResultsList with the found card.
+
+    Args:
+        None
+    Returns:
+        None
+    """
+    selected_card = getSelectedItemFromListBox("SearchResultsList")
+    if selected_card:
+        app.clearListBox("DeckBuildingList")
+        app.addListItem("DeckBuildingList", selected_card)
+        showCardImage(selected_card, "ImageCanvas")
+
+
 def getSelectedItemFromDeck(clickedItem):
     """Get the selected item from the DeckPreview list box."""
     selected_item = app.getListBox(clickedItem)
-    selected_card_name = selected_item[0].split("x ", 1)[
-        -1
-    ]  # Extract card name, it has 1, x, [, ], '
+    if not selected_item:  # Check if the list box is empty
+        print(f"No item selected in {clickedItem}.")
+        return
+
+    selected_card_name = selected_item[0].split("x ", 1)[-1]  # Extract card name
+    print(f"Selected card: {selected_card_name}")  # Debugging line
 
     selected_card = None
     for card in currentDeck.cards:
@@ -275,7 +355,13 @@ def saveCurrentDeck():
 
 
 def searchCard():
-    pass  # Implement the search card functionality here
+    """
+    Search for a card by its name.
+    """
+    card_name = app.getEntry("SearchField")
+    card = DeckParser.CreateSingleMTGCard(card_name)
+    app.clearListBox("SearchResultsList")
+    app.addListItem("SearchResultsList", card.getName())
 
 
 def goToPage(page):
@@ -370,9 +456,27 @@ app.addButton(
 )
 app.setButton("BackToWelcomeFromCreateDeck", "Back")
 
+app.addLabel("FormatLabel", "Select Deck Format:", row=2, column=0)
+app.addLabelOptionBox("Deck Format", ["Commander", "Pioneer"], row=3, column=0)
+
+
 app.addLabel("SearchLabel", "Search for a card:", row=2, column=0)
 app.addEntry("SearchField", row=3, column=0)  # Typing field
 app.addButton("Search", lambda: searchCard(), row=3, column=1)  # Search button
+app.startPanedFrame("SearchResults", row=4, column=0)
+app.addLabel("SearchResultsLabel", "Search Results")
+app.addListBox("SearchResultsList", [])  # List box for search results
+app.setListBoxChangeFunction(
+    "SearchResultsList", updateSearchResultsList
+)  # Show card image on click TODO new one
+app.startPanedFrame("DeckBuilding", row=4, column=0)
+app.addLabel("DeckBuildingLabel", "Deck Building")
+app.addListBox("DeckBuildingList", [])  # List box for deck building
+app.addCanvas("ImageCanvas", row=4, column=0)  # Canvas for card image
+
+
+app.stopPanedFrame()
+app.stopPanedFrame()
 app.stopFrame()
 
 ### --------------------------------------------------------------------------------
