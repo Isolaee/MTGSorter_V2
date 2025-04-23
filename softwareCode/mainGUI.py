@@ -13,7 +13,7 @@ from PIL import Image, ImageTk
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
 regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
 saved_decks_path = "./Decks"  # Path to the folder containing saved decks
-draft_deck = None  # Placeholder for the draft deck
+draft_deck = []  # Placeholder for the draft deck
 
 
 def press(btn):
@@ -198,9 +198,13 @@ def showCardImage(card_name, canvas):
     Returns:
         None
     """
-    # card = getSelectedItemFromListBox()
-    print(f"Selected card in ShowCardImage: {card_name}")  # Debugging line
-    image_url = card_name.getImage()
+
+    for i in draft_deck:
+        if i.getName() == card_name:
+            draft_card = i
+            image_url = draft_card.getImage()
+            break
+
     response = requests.get(image_url)
 
     if response.status_code == 200:
@@ -214,7 +218,7 @@ def showCardImage(card_name, canvas):
             file.write(response.content)
 
         # Get the tkinter Canvas object from appJar
-        canvas = app.getCanvas("GraphCanvas")
+        canvas = app.getCanvas("ImageCanvas")
 
         # Get the canvas size
         canvas.update_idletasks()  # Ensure the canvas size is updated
@@ -270,7 +274,6 @@ def getSelectedItemFromDeck(clickedItem):
         return
 
     selected_card_name = selected_item[0].split("x ", 1)[-1]  # Extract card name
-    print(f"Selected card: {selected_card_name}")  # Debugging line
 
     selected_card = None
     for card in currentDeck.cards:
@@ -360,6 +363,7 @@ def searchCard():
     """
     card_name = app.getEntry("SearchField")
     card = DeckParser.CreateSingleMTGCard(card_name)
+    draft_deck.append(card)
     app.clearListBox("SearchResultsList")
     app.addListItem("SearchResultsList", card.getName())
 
@@ -386,7 +390,7 @@ app.setBg("lightblue")
 app.setFont(20)
 
 ### --------------------------------------------------------------------------------
-# Page 1: Welcome Page
+# Welcome Page
 app.startFrame("WelcomePage", row=0, column=0)
 app.addLabel("welcomeLabel", "Welcome to the MTGDeckStats", colspan=2)
 app.addButton("Load Deck", lambda: goToPage("LoadDeckPage"), row=1, column=0)
@@ -457,7 +461,7 @@ app.addButton(
 app.setButton("BackToWelcomeFromCreateDeck", "Back")
 
 app.addLabel("FormatLabel", "Select Deck Format:", row=2, column=0)
-app.addLabelOptionBox("Deck Format", ["Commander", "Pioneer"], row=3, column=0)
+app.addLabelOptionBox("Select Format", ["Commander", "Pioneer"], row=3, column=0)
 
 
 app.addLabel("SearchLabel", "Search for a card:", row=2, column=0)
@@ -472,9 +476,10 @@ app.setListBoxChangeFunction(
 app.startPanedFrame("DeckBuilding", row=4, column=0)
 app.addLabel("DeckBuildingLabel", "Deck Building")
 app.addListBox("DeckBuildingList", [])  # List box for deck building
+app.startPanedFrame("Canvas", row=4, column=0)
 app.addCanvas("ImageCanvas", row=4, column=0)  # Canvas for card image
 
-
+app.stopPanedFrame()
 app.stopPanedFrame()
 app.stopPanedFrame()
 app.stopFrame()
