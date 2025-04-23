@@ -469,20 +469,18 @@ app.addLabelOptionBox("Select Format", ["Commander", "Pioneer"], row=3, column=0
 
 
 app.addLabel("SearchLabel", "Search for a card:", row=2, column=0)
-app.addEntry("SearchField", row=3, column=0)  # Typing field
+app.addEntry("SearchField", row=3, column=0)  # Search field
 app.addButton("Search", lambda: searchCard(), row=3, column=1)  # Search button
+
 app.startPanedFrame("SearchResults", row=4, column=0)
 app.addLabel("SearchResultsLabel", "Search Results")
 app.addListBox("SearchResultsList", [])  # List box for search results
-app.setListBoxChangeFunction(
-    "SearchResultsList", updateSearchResultsList
-)  # Show card image on click TODO new one
+app.setListBoxChangeFunction("SearchResultsList", updateSearchResultsList)
 app.startPanedFrame("DeckBuilding", row=4, column=0)
 app.addLabel("DeckBuildingLabel", "Deck Building")
 app.addListBox("DraftDeckList", [])
-app.setListBoxChangeFunction(
-    "DraftDeckList", updateDraftDeckList
-)  # List box for deck building
+app.setListBoxChangeFunction("DraftDeckList", updateDraftDeckList)
+
 app.startPanedFrame("Canvas", row=4, column=0)
 app.addCanvas("ImageCanvas", row=4, column=0)  # Canvas for card image
 
