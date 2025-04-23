@@ -261,8 +261,7 @@ def updateSearchResultsList():
     """
     selected_card = getSelectedItemFromListBox("SearchResultsList")
     if selected_card:
-        app.clearListBox("DeckBuildingList")
-        app.addListItem("DeckBuildingList", selected_card)
+        app.addListItem("DraftDeckList", selected_card)
         showCardImage(selected_card, "ImageCanvas")
 
 
@@ -366,6 +365,11 @@ def searchCard():
     draft_deck.append(card)
     app.clearListBox("SearchResultsList")
     app.addListItem("SearchResultsList", card.getName())
+
+
+def updateDraftDeckList():
+    app.clearListBox("DraftDeckList")
+    app.addListItem("DraftDeckList", "Draft Deck")
 
 
 def goToPage(page):
@@ -475,7 +479,10 @@ app.setListBoxChangeFunction(
 )  # Show card image on click TODO new one
 app.startPanedFrame("DeckBuilding", row=4, column=0)
 app.addLabel("DeckBuildingLabel", "Deck Building")
-app.addListBox("DeckBuildingList", [])  # List box for deck building
+app.addListBox("DraftDeckList", [])
+# app.setListBoxChangeFunction(
+#     "DraftDeckList", updateDraftDeckList
+# )  # List box for deck building
 app.startPanedFrame("Canvas", row=4, column=0)
 app.addCanvas("ImageCanvas", row=4, column=0)  # Canvas for card image
 
