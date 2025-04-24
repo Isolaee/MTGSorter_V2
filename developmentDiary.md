@@ -70,3 +70,8 @@ In my data, I have link to Scryfall so when creating card obj, it fetches the li
 And in software when you click that card in deck prewiev, it dynamicly fetches that image and temporarily saves it and shows it.
 This way There is no massive card image database in software.
 </details>
+
+<details>
+<summary>24/04</summary>
+For some while I have suffered from slow deck/card creation times. This was (ofcourse) due to horrible way to find card data. I used JSON and I just itered over it. Bascily having O(n/2) times. I dicided to implement SQLite Database to cut search times and enable better partail search and attribute search. Today I Implemented database, filled it and Created new methods. As you can imagine, load times were reduced drasticly. In the future I will implement attribute search and partial search.
+</details>
