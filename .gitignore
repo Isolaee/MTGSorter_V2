@@ -52,8 +52,12 @@ appJar/
 Data/
 Decks/
 MLDataAndModels/
+DataBase/
 
 # images
 *.png
 *.jpg
 *.gif
+
+# DataBase
+*.db

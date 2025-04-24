@@ -43,13 +43,13 @@ def press(btn):
             commander_name = app.getEntry("Commander Name")
 
         # Pass the regex engine to the DeckParser ### Testing CreateEDHDeck
-        currentDeck = DeckParser.CreateEDHDeck(
+        currentDeck = DeckParser.CreateEDHDeckFromDB(
             file_path,
             deck_name,
             format,
             commander_name,
             regex_engine_card,
-            regex_engine_type,
+            # regex_engine_type,
         )
 
         # Update the DeckPreview list box
@@ -361,7 +361,7 @@ def searchCard():
     Search for a card by its name.
     """
     card_name = app.getEntry("SearchField")
-    card = DeckParser.CreateSingleMTGCard(card_name)
+    card = DeckParser.CreateSingleMTGCardFromDB(card_name)
     draft_deck.append(card)
     app.clearListBox("SearchResultsList")
     app.addListItem("SearchResultsList", card.getName())

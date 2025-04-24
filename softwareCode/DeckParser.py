@@ -2,6 +2,7 @@ from .EDHDeck import EDHDeck
 from .MTGCard import MTGCard
 from pathlib import Path
 import json
+import sqlite3
 
 
 class DeckParser:
@@ -350,3 +351,142 @@ class DeckParser:
             )
 
         return card
+
+    @staticmethod
+    def get_card_from_db(card_name):
+        """
+        Search for a card in the database by its name and return its data.
+        Args:
+            card_name (str): The name of the card to search for.
+        Returns:
+            dict: A dictionary containing the card's data, or None if not found.
+        """
+        conn = sqlite3.connect("mtg_card_db.db")
+        cursor = conn.cursor()
+
+        # Query the database for the card
+        cursor.execute("SELECT * FROM cards WHERE name = ?", (card_name,))
+        row = cursor.fetchone()
+
+        # Close the connection
+        conn.close()
+
+        if row:
+            # Map the row to a dictionary
+            columns = [
+                "name",
+                "manacost",
+                "cmc",
+                "colors",
+                "coloridentity",
+                "power",
+                "toughness",
+                "oracletext",
+                "loyalty",
+                "typeline",
+                "cardtype",
+                "cardfaces",
+                "allparts",
+                "layout",
+                "artist",
+                "legalities",
+                "image",
+            ]
+            return dict(zip(columns, row))
+        else:
+            return None
+
+    @staticmethod
+    def create_card_object(card_name):
+        """
+        Search for a card in the database and create an MTGCard object.
+        Args:
+            card_name (str): The name of the card to search for.
+        Returns:
+            MTGCard: An MTGCard object, or raises an exception if the card is not found.
+        """
+        card_data = DeckParser.get_card_from_db(card_name)
+
+        if not card_data:
+            raise ValueError(f"Card '{card_name}' not found in the database.")
+
+        # Create and return the MTGCard object
+        return MTGCard(
+            name=card_data["name"],
+            manacost=card_data["manacost"],
+            cmc=card_data["cmc"],
+            colors=json.loads(card_data["colors"]),  # Convert JSON string back to list
+            colorIdentity=json.loads(
+                card_data["coloridentity"]
+            ),  # Convert JSON string back to list
+            power=card_data["power"],
+            toughness=card_data["toughness"],
+            oracleText=card_data["oracletext"],
+            loyalty=card_data["loyalty"],
+            typeline=card_data["typeline"],
+            cardType=card_data["cardtype"],
+            cardFaces=json.loads(
+                card_data["cardfaces"]
+            ),  # Convert JSON string back to list
+            allParts=json.loads(
+                card_data["allparts"]
+            ),  # Convert JSON string back to list
+            layout=card_data["layout"],
+            artist=card_data["artist"],
+            scryfallid=None,  # Not stored in the database, set to None or add it to the schema
+            legalities=json.loads(
+                card_data["legalities"]
+            ),  # Convert JSON string back to dict
+            image=card_data["image"],
+        )
+
+    @staticmethod
+    def CreateSingleMTGCardFromDB(card_name) -> MTGCard:
+        """
+        Create a single MTGCard object with proper values from the database.
+        Returns a MTGCard object.
+
+        This method replaces createSingleMTGCard and uses the database to fetch card data.
+        """
+        card = DeckParser.create_card_object(card_name)
+        return card
+
+    def CreateEDHDeckFromDB(
+        file_path: str,
+        deck_name: str,
+        format: str,
+        commander_name: str,
+        regex_engine_card,
+    ) -> EDHDeck:
+        """
+        Create an EDHDeck object from a file containing card names and quantities.
+        """
+
+        cards: list = []
+        commander = commander_name
+
+        namesDict = DeckParser.CreateDictkWithList(file_path, regex_engine_card)
+
+        for name in namesDict:
+            card = DeckParser.CreateSingleMTGCardFromDB(name)
+            if card:
+                for _ in range(namesDict[name]["quantity"]):
+                    cards.append(card)
+
+                if card.name == commander_name:
+                    commander = card
+
+        deck = EDHDeck(
+            name=deck_name,
+            format="commander",
+            cards=cards,
+            commander=commander,
+        )
+
+        # Check for format legality
+        isValid, error = deck.enforceFormatRules()
+        cond = False
+        if isValid == cond:
+            raise ValueError(error)
+
+        return deck
