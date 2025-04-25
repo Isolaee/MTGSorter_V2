@@ -38,7 +38,7 @@ On the bottom, you can see saved decks, and button for saving your active deck. 
 </details>
 
 <details>
-<summary>Usage - Create Deck</details>
+<summary>Usage - Create Deck</summary>
 On this page, you can (ot will be able, when this is done, marked with * symbol in this text) search for single cards using it's name or with attributes*. You can see image of the card and add it to your deck by clicking it. You can delete the card from you deck by clicking it in deck section*. You also can choose if deck is for spesific format* and give metadata*. You have option to save the deck*.
 </details>
 
@@ -48,6 +48,9 @@ Future section includes multiple subsection.
 These are divided by time, since my take on software changes over the project.
 <details>
 <summary>16/04</summary>
+
+# immidiate future
+
 There are two concrete updates that I want to do.
 1. Get the ML part working in software.
 2. While you have active deck, seeing the card image from request. (Done 19/04)
