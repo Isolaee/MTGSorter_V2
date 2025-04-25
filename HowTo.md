@@ -8,6 +8,7 @@ Currently these is no executable file. You can run program from root with "pytho
 <details>
 <summary>Pages</summary>
 There are three pages at the moment.
+
 - Welcome
 - Load deck page, which is for importing a deck.
 - Create a deck, which is for making decks.
@@ -19,8 +20,9 @@ Welcome is "redirect" page, in here you can choose what to do.
 </details>
 
 <details>
-<sumary>Usage -  Deck import</summary>
+<summary>Usage -  Deck import</summary>
 The software GUI can be divided in thee sections.
+
 - Deckload -> loading new deck from txt
 - Deckview -> Seeing Deck Data
 - Saved Decks -> see saved Decks and load them.
