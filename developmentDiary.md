@@ -33,7 +33,7 @@ Basicly the saving and loading saved decks feel better and require less clicks.
 <details>
 <summary>15/04</summary>
 
-# reading and makings cards
+# Reading and makings cards
 For some time I have had problem with
 - Loading time
 - Two faced cards.

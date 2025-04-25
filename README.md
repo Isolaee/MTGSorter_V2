@@ -17,7 +17,7 @@ Not so simple plan is to:
 - Git: pre-commit/Git
 
 ## GUI
-- JarApp (not included in Git)
+- AppJar (not included in Git)
 
 ## Code is located in Code folder
 - App.py -> app starting point
@@ -28,9 +28,11 @@ Not so simple plan is to:
 - MTGCard.py -> Card Class, that hold the datastructure of a MTG card.
 
 ## Tests are located in tests folder
+- EDHDeck tests
 
 ## Diagrams are located in Schemas folder.
 - Deck & Card class diagram
+- Create Deck flowchart
 
 ## Machine Learning
 The plan is to implement my old (rewritten) ML model to this software.
