@@ -68,10 +68,19 @@ I value the card Image feature because, there is over 40 000 unique cards in MTG
 I implemented this as follow.
 In my data, I have link to Scryfall so when creating card obj, it fetches the link.
 And in software when you click that card in deck prewiev, it dynamicly fetches that image and temporarily saves it and shows it.
-This way There is no massive card image database in software.
+This way There is no massive card image database in the software.
 </details>
 
 <details>
 <summary>24/04</summary>
+
+# Database update
+
 For some while I have suffered from slow deck/card creation times. This was (ofcourse) due to horrible way to find card data. I used JSON and I just itered over it. Bascily having O(n/2) times. I dicided to implement SQLite Database to cut search times and enable better partail search and attribute search. Today I Implemented database, filled it and Created new methods. As you can imagine, load times were reduced drasticly. In the future I will implement attribute search and partial search.
+
+Some reasons to choose Relation database, SQLite in this case.
+- Two features, partial match and attribute search are important.
+- SQLite has native support.
+- With SQLite I don't have to care about balancing Binary trees, because DB does it for me. I was thinking about implementing Binary search tree with my data.
+- SQLite gives me flexibility, when creating new features. With this software, I don't benefit from absolute search time. It just needs to be fast enought not to be noticed by user.
 </details>
