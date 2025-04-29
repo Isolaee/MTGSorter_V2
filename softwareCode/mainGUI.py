@@ -8,6 +8,7 @@ from matplotlib.ticker import MaxNLocator
 import requests
 import os
 from PIL import Image, ImageTk
+import sqlite3
 
 
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
@@ -161,10 +162,10 @@ def loadDeckByClick(clickedDeck):
     """
     selected_deck = app.getListBox(clickedDeck)
     if selected_deck:
-        file_path = f"Decks/{selected_deck[0]}"  # Construct the full file path
+        file_path = selected_deck[0]  # Construct the full file path
         try:
             global currentDeck
-            currentDeck = DeckParser.deserializeDeck(file_path)
+            currentDeck = DeckParser.loadDeckFromDB(file_path)
             # Update the DeckPreview list box
             app.clearListBox("DeckPreview", callFunction=False)
             unPackCardNames()
@@ -333,26 +334,40 @@ def getSelectedItemFromDeck(clickedItem):
 
 def populateSavedDecks():
     """
-    Populate the Saved Decks list box with the contents of the saved decks folder
-    and adjust its size to fit the content.
+    Populate the Saved Decks list box with the names of all decks in the database.
     """
-    app.clearListBox("SavedDecks")
-    saved_decks = list(
-        DeckParser.read_folder_contents(saved_decks_path)
-    )  # Convert generator to list
-    app.addListItems("SavedDecks", saved_decks)
+    app.clearListBox("SavedDecks")  # Clear the list box first
 
-    # Dynamically adjust the size of the listbox
-    num_rows = len(saved_decks)
-    app.setListBoxRows("SavedDecks", num_rows if num_rows > 0 else 1)  # At least 1 row
+    # Query the database for all saved decks
+    conn = sqlite3.connect("mtg_card_db.db")
+    cursor = conn.cursor()
+
+    try:
+        # Assuming there is a table `decks` with a column `name` for deck names
+        cursor.execute("SELECT name FROM decks")
+        saved_decks = [row[0] for row in cursor.fetchall()]  # Fetch all deck names
+
+        # Add the deck names to the list box
+        app.addListItems("SavedDecks", saved_decks)
+
+        # Dynamically adjust the size of the list box
+        num_rows = len(saved_decks)
+        app.setListBoxRows(
+            "SavedDecks", num_rows if num_rows > 0 else 1
+        )  # At least 1 row
+    except sqlite3.Error as e:
+        print(f"Error querying database: {e}")
+    finally:
+        conn.close()  # Ensure the database connection is closed
 
 
 ## Save deck
 def saveCurrentDeck():
     """Save the current deck to a file."""
+    global currentDeck
     cond = None
     if currentDeck != cond:
-        DeckParser.serializeDeck(currentDeck)
+        DeckParser.saveDeckToDB(currentDeck)
     populateSavedDecks()
 
 
