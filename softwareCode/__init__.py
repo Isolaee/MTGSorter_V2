@@ -11,6 +11,7 @@ from .MTGCard import MTGCard
 
 # Utility imports
 from .DeckParser import DeckParser
+from .DBQueries import DBQueries
 
 
 # Explicitly define what is exported when using `from softwareCode import *`
@@ -21,4 +22,5 @@ __all__ = [
     "PlayingCard",
     "MTGCard",
     "DeckParser",
+    "DBQueries",
 ]

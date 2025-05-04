@@ -1,11 +1,16 @@
-import sqlite3
-from EDHDeck import EDHDeck
-from MTGCard import MTGCard
-from DeckParser import DeckParser
+from .EDHDeck import EDHDeck
+from .MTGCard import MTGCard
+from .DeckParser import DeckParser
 import json
+import sqlite3
 
 
-class SQLite:
+class DBQueries:
+    """
+    A class to handle database queries for Magic: The Gathering cards and decks.
+    """
+
+    @staticmethod
     def queryCardsByProperties(properties: dict) -> list:
         """
         Query the card database based on given properties.

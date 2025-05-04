@@ -8,7 +8,7 @@ import requests
 import os
 from PIL import Image, ImageTk
 import sqlite3
-import DBQueries
+from .DBQueries import DBQueries
 
 
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
@@ -43,7 +43,7 @@ def press(btn):
         if format == "Commander":
             commander_name = app.getEntry("Commander Name")
 
-        # Pass the regex engine to the DeckParser ### Testing CreateEDHDeck
+        # Pass the regex engine to the DeckParser
         currentDeck = DBQueries.CreateEDHDeckFromDB(
             file_path,
             deck_name,
@@ -395,6 +395,29 @@ def goToPage(page):
     app.showFrame(page)
 
 
+def searchCardsByProperties():
+    cmc = app.getEntry("Search CMC")
+    colors = app.getEntry("Search Colors")
+
+    # Build the filters dictionary
+    filters = {}
+    if cmc:
+        filters["cmc"] = int(cmc)
+    if colors:
+        filters["colors"] = colors.lower()
+
+    # Query the database
+    matching_cards = DBQueries.queryCardsByProperties(filters)
+
+    # Update the SearchResultsList
+    app.clearListBox("SearchResultsList")
+    for card in matching_cards:
+        app.addListItem(
+            "SearchResultsList",
+            f"{card['name']} (CMC: {card['cmc']}, Colors: {card['colors']})",
+        )
+
+
 ### --------------------------------------------------------------------------------
 ### Global variables
 ### GUI
@@ -486,6 +509,10 @@ app.addLabelOptionBox("Select Format", ["Commander", "Pioneer"], row=3, column=0
 app.addLabel("SearchLabel", "Search for a card:", row=2, column=0)
 app.addEntry("SearchField", row=3, column=0)  # Search field
 app.addButton("Search", lambda: searchCard(), row=3, column=1)  # Search button
+
+app.addLabelEntry("Search CMC")
+app.addLabelEntry("Search Colors")
+app.addButton("Search Cards", lambda: searchCardsByProperties())
 
 app.startPanedFrame("SearchResults", row=4, column=0)
 app.addLabel("SearchResultsLabel", "Search Results")
