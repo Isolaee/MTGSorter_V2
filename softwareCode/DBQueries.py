@@ -82,15 +82,50 @@ class DBQueries:
         return results
 
     @staticmethod
-    def CreateSingleMTGCardFromDB(card_name) -> MTGCard:
+    def CreateSingleMTGCardFromDB(card_name):
         """
-        Create a single MTGCard object with proper values from the database.
-        Returns a MTGCard object.
+        Create a single MTGCard object from the database by its name.
+        Args:
+            card_name (str): The name of the card to search for.
+        Returns:
+            MTGCard: An MTGCard object, or None if the card is not found.
+        """
+        card_data = DBQueries.get_card_from_db(card_name)
+        if not card_data or len(card_data) != 1:
+            print(f"Card '{card_name}' not found or multiple matches exist.")
+            return None
 
-        This method replaces createSingleMTGCard and uses the database to fetch card data.
-        """
-        card = DeckParser.create_card_object(card_name)
-        return card
+        card_data = card_data[0]  # Get the first (and only) match
+
+        # Create and return the MTGCard object
+        return MTGCard(
+            name=card_data["name"],
+            manacost=card_data["manacost"],
+            cmc=card_data["cmc"],
+            colors=json.loads(card_data["colors"]),  # Convert JSON string back to list
+            colorIdentity=json.loads(
+                card_data["coloridentity"]
+            ),  # Convert JSON string back to list
+            power=card_data["power"],
+            toughness=card_data["toughness"],
+            oracleText=card_data["oracletext"],
+            loyalty=card_data["loyalty"],
+            typeline=card_data["typeline"],
+            cardType=card_data["cardtype"],
+            cardFaces=json.loads(
+                card_data["cardfaces"]
+            ),  # Convert JSON string back to list
+            allParts=json.loads(
+                card_data["allparts"]
+            ),  # Convert JSON string back to list
+            layout=card_data["layout"],
+            artist=card_data["artist"],
+            scryfallid=None,  # Not stored in the database, set to None or add it to the schema
+            legalities=json.loads(
+                card_data["legalities"]
+            ),  # Convert JSON string back to dict
+            image=card_data["image"],
+        )
 
     def CreateEDHDeckFromDB(
         file_path: str,
@@ -225,3 +260,51 @@ class DBQueries:
             commander=commander,
             cards=cards,
         )
+
+    @staticmethod
+    def get_card_from_db(card_name):
+        """
+        Search for cards in the database by their name and return their data.
+        Args:
+            card_name (str): The name of the card to search for.
+        Returns:
+            list: A list of dictionaries containing the cards' data, or an empty list if no matches are found.
+        """
+        search_pattern = f"%{card_name}%"  # Add wildcards for partial matching
+        conn = sqlite3.connect("mtg_card_db.db")
+        cursor = conn.cursor()
+
+        try:
+            # Query the database for cards with names matching the pattern
+            cursor.execute("SELECT * FROM cards WHERE name LIKE ?", (search_pattern,))
+            rows = cursor.fetchall()
+
+            if rows:
+                # Map the rows to a list of dictionaries
+                columns = [
+                    "name",
+                    "manacost",
+                    "cmc",
+                    "colors",
+                    "coloridentity",
+                    "power",
+                    "toughness",
+                    "oracletext",
+                    "loyalty",
+                    "typeline",
+                    "cardtype",
+                    "cardfaces",
+                    "allparts",
+                    "layout",
+                    "artist",
+                    "legalities",
+                    "image",
+                ]
+                return [dict(zip(columns, row)) for row in rows]
+            else:
+                return []
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return []
+        finally:
+            conn.close()

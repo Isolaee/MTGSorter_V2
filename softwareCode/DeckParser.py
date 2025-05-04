@@ -2,7 +2,6 @@ from .EDHDeck import EDHDeck
 from .MTGCard import MTGCard
 from pathlib import Path
 import json
-import sqlite3
 
 
 class DeckParser:
@@ -351,50 +350,6 @@ class DeckParser:
             )
 
         return card
-
-    @staticmethod
-    def get_card_from_db(card_name):
-        """
-        Search for a card in the database by its name and return its data.
-        Args:
-            card_name (str): The name of the card to search for.
-        Returns:
-            dict: A dictionary containing the card's data, or None if not found.
-        """
-        conn = sqlite3.connect("mtg_card_db.db")
-        cursor = conn.cursor()
-
-        # Query the database for the card
-        cursor.execute("SELECT * FROM cards WHERE name = ?", (card_name,))
-        row = cursor.fetchone()
-
-        # Close the connection
-        conn.close()
-
-        if row:
-            # Map the row to a dictionary
-            columns = [
-                "name",
-                "manacost",
-                "cmc",
-                "colors",
-                "coloridentity",
-                "power",
-                "toughness",
-                "oracletext",
-                "loyalty",
-                "typeline",
-                "cardtype",
-                "cardfaces",
-                "allparts",
-                "layout",
-                "artist",
-                "legalities",
-                "image",
-            ]
-            return dict(zip(columns, row))
-        else:
-            return None
 
     @staticmethod
     def create_card_object(card_name):

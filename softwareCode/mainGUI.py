@@ -373,13 +373,46 @@ def saveCurrentDeck():
 
 def searchCard():
     """
-    Search for a card by its name.
+    Search for a card by its name, allowing partial matches and handling multiple results.
     """
     card_name = app.getEntry("SearchField")
-    card = DBQueries.CreateSingleMTGCardFromDB(card_name)
-    draft_deck.append(card)
+    if not card_name:
+        print("Please enter a card name to search.")
+        return
+
+    # Get all matching cards from the database
+    matching_cards = DBQueries.get_card_from_db(card_name)
+
+    # Clear the search results list box
     app.clearListBox("SearchResultsList")
-    app.addListItem("SearchResultsList", card.getName())
+
+    if matching_cards:
+        # Add matching card names to the search results list box
+        for card in matching_cards:
+            app.addListItem("SearchResultsList", card["name"])
+    else:
+        app.addListItem("SearchResultsList", "No matches found.")
+
+    # Allow the user to select a card from the search results
+    def selectCardFromResults():
+        selected_card_name = app.getListBox("SearchResultsList")
+        if selected_card_name:
+            selected_card_name = selected_card_name[0]  # Get the first selected item
+            if selected_card_name != "No matches found.":
+                # Use the DBQueries.CreateSingleMTGCardFromDB method to get a card object
+                card = DBQueries.CreateSingleMTGCardFromDB(selected_card_name)
+                if card:  # Ensure the card is valid
+                    draft_deck.append(card)  # Append the card object to the draft_deck
+                    app.addListItem(
+                        "DraftDeckList", card.getName()
+                    )  # Use getName() on the card object
+                else:
+                    print(f"Card '{selected_card_name}' could not be created.")
+            else:
+                print("No valid card selected.")
+
+    # Set the list box change function to handle card selection
+    app.setListBoxChangeFunction("SearchResultsList", lambda _: selectCardFromResults())
 
 
 def updateDraftDeckList():
