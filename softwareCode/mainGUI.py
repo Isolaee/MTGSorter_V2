@@ -1,6 +1,5 @@
 # Import GUI (JarAPp)
 from appJar import gui
-from .DeckParser import DeckParser
 import re
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -9,6 +8,7 @@ import requests
 import os
 from PIL import Image, ImageTk
 import sqlite3
+import DBQueries
 
 
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
@@ -44,7 +44,7 @@ def press(btn):
             commander_name = app.getEntry("Commander Name")
 
         # Pass the regex engine to the DeckParser ### Testing CreateEDHDeck
-        currentDeck = DeckParser.CreateEDHDeckFromDB(
+        currentDeck = DBQueries.CreateEDHDeckFromDB(
             file_path,
             deck_name,
             format,
@@ -165,7 +165,7 @@ def loadDeckByClick(clickedDeck):
         file_path = selected_deck[0]  # Construct the full file path
         try:
             global currentDeck
-            currentDeck = DeckParser.loadDeckFromDB(file_path)
+            currentDeck = DBQueries.loadDeckFromDB(file_path)
             # Update the DeckPreview list box
             app.clearListBox("DeckPreview", callFunction=False)
             unPackCardNames()
@@ -367,7 +367,7 @@ def saveCurrentDeck():
     global currentDeck
     cond = None
     if currentDeck != cond:
-        DeckParser.saveDeckToDB(currentDeck)
+        DBQueries.saveDeckToDB(currentDeck)
     populateSavedDecks()
 
 
@@ -376,7 +376,7 @@ def searchCard():
     Search for a card by its name.
     """
     card_name = app.getEntry("SearchField")
-    card = DeckParser.CreateSingleMTGCardFromDB(card_name)
+    card = DBQueries.CreateSingleMTGCardFromDB(card_name)
     draft_deck.append(card)
     app.clearListBox("SearchResultsList")
     app.addListItem("SearchResultsList", card.getName())
