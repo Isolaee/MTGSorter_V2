@@ -393,25 +393,21 @@ def searchCard():
     else:
         app.addListItem("SearchResultsList", "No matches found.")
 
-    # Allow the user to select a card from the search results
     def selectCardFromResults():
         selected_card_name = app.getListBox("SearchResultsList")
         if selected_card_name:
-            selected_card_name = selected_card_name[0]  # Get the first selected item
+            selected_card_name = selected_card_name[0]
             if selected_card_name != "No matches found.":
-                # Use the DBQueries.CreateSingleMTGCardFromDB method to get a card object
+
                 card = DBQueries.CreateSingleMTGCardFromDB(selected_card_name)
-                if card:  # Ensure the card is valid
-                    draft_deck.append(card)  # Append the card object to the draft_deck
-                    app.addListItem(
-                        "DraftDeckList", card.getName()
-                    )  # Use getName() on the card object
+                if card:
+                    draft_deck.append(card)
+                    app.addListItem("DraftDeckList", card.getName())
                 else:
                     print(f"Card '{selected_card_name}' could not be created.")
             else:
                 print("No valid card selected.")
 
-    # Set the list box change function to handle card selection
     app.setListBoxChangeFunction("SearchResultsList", lambda _: selectCardFromResults())
 
 
