@@ -181,18 +181,23 @@ def getSelectedItemFromListBox(clickedItem):
     Get the selected item from the list box.
 
     Args:
-        clickedItem (str): The name of the clicked item.
+        The field look from
     Returns:
+        The selected item from the list box as a card object.
 
     """
     selected_item = app.getListBox(clickedItem)
+    print(f"Selected item from {clickedItem}: {selected_item}")
     if selected_item:
         selected_card_name = selected_item[0].split("x ", 1)[-1]
-        return selected_card_name
+        card = DBQueries.get_card_from_db(selected_card_name)
+        return card[0] if card else None
+    else:
+        print(f"No item selected in {clickedItem}.")
     return None
 
 
-def showCardImage(card_name, canvas):
+def showCardImage(card, canvas):
     """
     Show the image of the selected card to Selected Canvas.
 
@@ -202,11 +207,9 @@ def showCardImage(card_name, canvas):
     Returns:
         None
     """
+    global currentDeck
 
-    for i in currentDeck.getCards():
-        if i.getName() == card_name:
-            image_url = i.getImage()
-            break
+    image_url = card.getImage()
 
     response = requests.get(image_url)
 
@@ -255,15 +258,12 @@ def showCardImage(card_name, canvas):
 
 def updateSearchResultsList():
     """Update the search results list when a card is selected."""
-    selected_card_name = getSelectedItemFromListBox("SearchResultsList")
-    if selected_card_name:
-        matching_cards = DBQueries.get_card_from_db(selected_card_name)
-        if matching_cards:
-            mtg_card = matching_cards[0]
-            draftDeckList.append(mtg_card)
-            app.addListItem("DraftDeckList", mtg_card.getName())
-            showCardImage(mtg_card.getName(), "ImageCanvas")
-            updateDeckStats()  # Update the deck stats
+    card = getSelectedItemFromListBox("SearchResultsList")
+    if card:
+        draftDeckList.append(card)
+        app.addListItem("DraftDeckList", card.getName())
+        showCardImage(card.getName(), "ImageCanvas")
+        updateDeckStats()  # Update the deck stats
 
 
 def getSelectedItemFromDeck(clickedItem):
