@@ -84,6 +84,7 @@ class DBQueries:
         finally:
             conn.close()
 
+    @staticmethod
     def CreateEDHDeckFromDB(
         file_path: str,
         deck_name: str,
@@ -96,24 +97,35 @@ class DBQueries:
         """
 
         cards: list = []
-        commander = commander_name
 
         namesDict = DeckParser.CreateDictkWithList(file_path, regex_engine_card)
 
-        for name in namesDict:
-            card = DeckParser.CreateSingleMTGCardFromDB(name)
-            if card:
-                for _ in range(namesDict[name]["quantity"]):
-                    cards.append(card)
+        for card_name, card_data in namesDict.items():
+            quantity = card_data.get("quantity", 0)  # default to 1 if not found
 
-                if card.name == commander_name:
-                    commander = card
+            # Validate quantity
+            if not isinstance(quantity, int) or quantity <= 0:
+                print(f"Invalid quantity '{quantity}' for card '{card_name}'. Skipping.")
+                continue
+
+            # Retrieve the card from the database
+            matching_cards = DBQueries.get_card_from_db(card_name, strict=True)
+            if matching_cards:
+                # Add the card to the list as many times as its quantity
+                for _ in range(quantity):
+                    cards.append(matching_cards[0])  # Add the first matching card
+            else:
+                print(f"Card '{card_name}' not found in the database.")
+
+        for _ in cards:
+            if _.name == commander_name:
+                commanderCard = _
 
         deck = EDHDeck(
             name=deck_name,
             format="commander",
             cards=cards,
-            commander=commander,
+            commander=commanderCard,
         )
 
         # Check for format legality
@@ -124,41 +136,70 @@ class DBQueries:
 
         return deck
 
-    def saveDeckToDB(deck):
+    def saveDeckToDB(deck) -> None:
         """
         Save the deck to the database.
         """
         conn = sqlite3.connect("mtg_card_db.db")
         cursor = conn.cursor()
 
-        # Create the table if it doesn't exist
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS decks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                format TEXT NOT NULL,
-                commander TEXT NOT NULL,
-                cards TEXT NOT NULL
-            )
-            """
-        )
-
-        # Serialize the commander and cards as JSON
-        commander_json = json.dumps(deck.commander.to_dict()) if deck.commander else None
+        format = deck.getFormat()
         cards_json = json.dumps([card.to_dict() for card in deck.cards])
 
-        # Insert the deck into the database
-        cursor.execute(
-            """
-            INSERT INTO decks (name, format, commander, cards)
-            VALUES (?, ?, ?, ?)
-            """,
-            (deck.name, deck.format, commander_json, cards_json),
-        )
+        if format == "commander":
+            # Create the table if it doesn't exist
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS decks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    format TEXT NOT NULL,
+                    commander TEXT NOT NULL,
+                    cards TEXT NOT NULL
+                )
+                """
+            )
 
-        # Commit the changes and close the connection
-        conn.commit()
+            # Serialize the commander and cards as JSON
+            commander_json = (
+                json.dumps(deck.commander.to_dict()) if deck.commander else None
+            )
+
+            # Insert the deck into the database
+            cursor.execute(
+                """
+                INSERT INTO decks (name, format, commander, cards)
+                VALUES (?, ?, ?, ?)
+                """,
+                (deck.name, deck.format, commander_json, cards_json),
+            )
+
+            # Commit the changes and close the connection
+            conn.commit()
+
+        elif format == "pioneer":
+            # Create the table if it doesn't exist
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS decks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    format TEXT NOT NULL,
+                    cards TEXT NOT NULL
+                )
+                """
+            )
+
+            # Insert the deck into the database
+            cursor.execute(
+                """
+                INSERT INTO decks (name, format, cards)
+                VALUES (?, ?, ?, ?)
+                """,
+                (deck.name, deck.format, cards_json),
+            )
+            conn.commit()
+
         conn.close()
 
     def loadDeckFromDB(deck_name: str) -> EDHDeck:
@@ -219,7 +260,7 @@ class DBQueries:
         )
 
     @staticmethod
-    def get_card_from_db(card_name: str) -> list:
+    def get_card_from_db(card_name: str, strict: bool = False) -> list:
         """
         Search for cards in the database by their name and return MTGCard objects.
 
@@ -229,7 +270,11 @@ class DBQueries:
         Returns:
             list: A list of MTGCard objects, or an empty list if no matches are found.
         """
-        search_pattern = f"%{card_name}%"  # Add wildcards for partial matching
+        if strict:
+            search_pattern = card_name
+        else:
+            search_pattern = f"%{card_name}%"  # Add wildcards for partial matching
+
         conn = sqlite3.connect("mtg_card_db.db")
         cursor = conn.cursor()
 

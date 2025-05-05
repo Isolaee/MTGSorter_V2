@@ -591,6 +591,10 @@ app.stopFrame()
 # Add a button to save the current draft deck
 app.addButton("Save Draft Deck", saveCurrentDeck, row=5, column=1)
 
+# Add format selection to the Create Deck Page
+app.addLabel("FormatLabelCraeteDeck", "Select Deck Format:", row=2, column=0)
+app.addLabelOptionBox("Select Format for Deck", ["Commander", "Pioneer"], row=3, column=0)
+
 app.stopPanedFrame()
 app.stopPanedFrame()
 app.stopPanedFrame()

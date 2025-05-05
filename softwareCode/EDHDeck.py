@@ -100,7 +100,7 @@ class EDHDeck(MTGDeck):
         if len(self.cards) != self.formatRules.get("deck_size"):
             formatCheckFails[
                 "Deck Size"
-            ] = f"Deck size is invalid. Deck has to be: {self.formatRules.get('deck_size')}"
+            ] = f"Deck size is invalid. Deck has to be: {self.formatRules.get('deck_size')}, but has {len(self.cards)} cards."
             isValid = False
         else:
             len(self.cards) == self.formatRules.get("deck_size")
