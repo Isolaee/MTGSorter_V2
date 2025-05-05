@@ -11,121 +11,78 @@ class DBQueries:
     """
 
     @staticmethod
-    def queryCardsByProperties(properties: dict) -> list:
+    def queryCardsByProperties(filters: dict) -> list:
         """
-        Query the card database based on given properties.
+        Query the card database based on given properties and return MTGCard objects.
 
         Args:
-            properties (dict): A dictionary of properties to filter cards by.
-                            Example: {"colors": "red", "cmc": 3}
+            filters (dict): A dictionary of properties to filter cards by.
+                            Example: {"name": "%fire%", "cmc": 3}
 
         Returns:
-            list: A list of dictionaries representing the cards that match the query.
+            list: A list of MTGCard objects that match the query, or an empty list if no matches are found.
         """
         conn = sqlite3.connect("mtg_card_db.db")
         cursor = conn.cursor()
 
         # Base query
-        query = "SELECT * FROM cards"
+        query = "SELECT * FROM cards WHERE "
         conditions = []
         values = []
 
-        # Dynamically build the WHERE clause based on the properties
-        for key, value in properties.items():
-            if value:  # Only include non-empty filters
-                if isinstance(value, (list, tuple)):
-                    # Handle lists (e.g., colors IN ('red', 'blue'))
-                    placeholders = ", ".join("?" for _ in value)
-                    conditions.append(f"{key} IN ({placeholders})")
-                    values.extend(value)
-                else:
-                    # Handle single values (e.g., cmc = ?)
-                    conditions.append(f"{key} = ?")
-                    values.append(value)
+        # Dynamically build the WHERE clause based on the filters
+        for key, value in filters.items():
+            if key == "name":
+                # Use LIKE for partial matches in the name field
+                conditions.append(f"{key} LIKE ?")
+            else:
+                # Use = for exact matches
+                conditions.append(f"{key} = ?")
+            values.append(value)
 
-        # Add conditions to the query if any exist
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
+        # Combine conditions into the query
+        query += " AND ".join(conditions)
 
         try:
             # Execute the query
             cursor.execute(query, values)
             rows = cursor.fetchall()
 
-            # Map the rows to dictionaries
-            columns = [
-                "name",
-                "manacost",
-                "cmc",
-                "colors",
-                "coloridentity",
-                "power",
-                "toughness",
-                "oracletext",
-                "loyalty",
-                "typeline",
-                "cardtype",
-                "cardfaces",
-                "allparts",
-                "layout",
-                "artist",
-                "legalities",
-                "image",
-            ]
-            results = [dict(zip(columns, row)) for row in rows]
+            if rows:
+                return [
+                    MTGCard(
+                        name=row[0],
+                        manacost=row[1],
+                        cmc=row[2],
+                        colors=json.loads(row[3]),  # Convert JSON string back to list
+                        colorIdentity=json.loads(
+                            row[4]
+                        ),  # Convert JSON string back to list
+                        power=row[5],
+                        toughness=row[6],
+                        oracleText=row[7],
+                        loyalty=row[8],
+                        typeline=row[9],
+                        cardType=row[10],
+                        cardFaces=json.loads(row[11]),  # Convert JSON string back to list
+                        allParts=json.loads(row[12]),  # Convert JSON string back to list
+                        layout=row[13],
+                        artist=row[14],
+                        scryfallid=None,  # Not stored in the database, set to None or add it to the schema
+                        legalities=json.loads(
+                            row[15]
+                        ),  # Convert JSON string back to dict
+                        image=row[16],
+                    )
+                    for row in rows
+                ]
+            else:
+                return []
         except sqlite3.Error as e:
             print(f"Database error: {e}")
-            results = []
+            return []
         finally:
             conn.close()
-
-        return results
-
-    @staticmethod
-    def CreateSingleMTGCardFromDB(card_name):
-        """
-        Create a single MTGCard object from the database by its name.
-        Args:
-            card_name (str): The name of the card to search for.
-        Returns:
-            MTGCard: An MTGCard object, or None if the card is not found.
-        """
-        card_data = DBQueries.get_card_from_db(card_name)
-        if not card_data or len(card_data) != 1:
-            print(f"Card '{card_name}' not found or multiple matches exist.")
-            return None
-
-        card_data = card_data[0]  # Get the first (and only) match
-
-        # Create and return the MTGCard object
-        return MTGCard(
-            name=card_data["name"],
-            manacost=card_data["manacost"],
-            cmc=card_data["cmc"],
-            colors=json.loads(card_data["colors"]),  # Convert JSON string back to list
-            colorIdentity=json.loads(
-                card_data["coloridentity"]
-            ),  # Convert JSON string back to list
-            power=card_data["power"],
-            toughness=card_data["toughness"],
-            oracleText=card_data["oracletext"],
-            loyalty=card_data["loyalty"],
-            typeline=card_data["typeline"],
-            cardType=card_data["cardtype"],
-            cardFaces=json.loads(
-                card_data["cardfaces"]
-            ),  # Convert JSON string back to list
-            allParts=json.loads(
-                card_data["allparts"]
-            ),  # Convert JSON string back to list
-            layout=card_data["layout"],
-            artist=card_data["artist"],
-            scryfallid=None,  # Not stored in the database, set to None or add it to the schema
-            legalities=json.loads(
-                card_data["legalities"]
-            ),  # Convert JSON string back to dict
-            image=card_data["image"],
-        )
 
     def CreateEDHDeckFromDB(
         file_path: str,
@@ -262,13 +219,15 @@ class DBQueries:
         )
 
     @staticmethod
-    def get_card_from_db(card_name):
+    def get_card_from_db(card_name: str) -> list:
         """
-        Search for cards in the database by their name and return their data.
+        Search for cards in the database by their name and return MTGCard objects.
+
         Args:
             card_name (str): The name of the card to search for.
+
         Returns:
-            list: A list of dictionaries containing the cards' data, or an empty list if no matches are found.
+            list: A list of MTGCard objects, or an empty list if no matches are found.
         """
         search_pattern = f"%{card_name}%"  # Add wildcards for partial matching
         conn = sqlite3.connect("mtg_card_db.db")
@@ -280,27 +239,34 @@ class DBQueries:
             rows = cursor.fetchall()
 
             if rows:
-                # Map the rows to a list of dictionaries
-                columns = [
-                    "name",
-                    "manacost",
-                    "cmc",
-                    "colors",
-                    "coloridentity",
-                    "power",
-                    "toughness",
-                    "oracletext",
-                    "loyalty",
-                    "typeline",
-                    "cardtype",
-                    "cardfaces",
-                    "allparts",
-                    "layout",
-                    "artist",
-                    "legalities",
-                    "image",
+                # Map the rows to MTGCard objects
+                return [
+                    MTGCard(
+                        name=row[0],
+                        manacost=row[1],
+                        cmc=row[2],
+                        colors=json.loads(row[3]),  # Convert JSON string back to list
+                        colorIdentity=json.loads(
+                            row[4]
+                        ),  # Convert JSON string back to list
+                        power=row[5],
+                        toughness=row[6],
+                        oracleText=row[7],
+                        loyalty=row[8],
+                        typeline=row[9],
+                        cardType=row[10],
+                        cardFaces=json.loads(row[11]),  # Convert JSON string back to list
+                        allParts=json.loads(row[12]),  # Convert JSON string back to list
+                        layout=row[13],
+                        artist=row[14],
+                        scryfallid=None,  # Not stored in the database, set to None or add it to the schema
+                        legalities=json.loads(
+                            row[15]
+                        ),  # Convert JSON string back to dict
+                        image=row[16],
+                    )
+                    for row in rows
                 ]
-                return [dict(zip(columns, row)) for row in rows]
             else:
                 return []
         except sqlite3.Error as e:

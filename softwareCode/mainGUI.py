@@ -202,8 +202,7 @@ def showCardImage(card_name, canvas):
 
     for i in draft_deck:
         if i.getName() == card_name:
-            draft_card = i
-            image_url = draft_card.getImage()
+            image_url = i.getImage()
             break
 
     response = requests.get(image_url)
@@ -389,26 +388,10 @@ def searchCard():
     if matching_cards:
         # Add matching card names to the search results list box
         for card in matching_cards:
-            app.addListItem("SearchResultsList", card["name"])
+            draft_deck.append(card)  # Add the card to the draft deck
+            app.addListItem("SearchResultsList", card.getName())
     else:
         app.addListItem("SearchResultsList", "No matches found.")
-
-    def selectCardFromResults():
-        selected_card_name = app.getListBox("SearchResultsList")
-        if selected_card_name:
-            selected_card_name = selected_card_name[0]
-            if selected_card_name != "No matches found.":
-
-                card = DBQueries.CreateSingleMTGCardFromDB(selected_card_name)
-                if card:
-                    draft_deck.append(card)
-                    app.addListItem("DraftDeckList", card.getName())
-                else:
-                    print(f"Card '{selected_card_name}' could not be created.")
-            else:
-                print("No valid card selected.")
-
-    app.setListBoxChangeFunction("SearchResultsList", lambda _: selectCardFromResults())
 
 
 def updateDraftDeckList():
@@ -421,30 +404,48 @@ def goToPage(page):
     app.hideFrame("WelcomePage")
     app.hideFrame("LoadDeckPage")
     app.hideFrame("CreateDeckPage")
+    app.hideFrame("SearchByAttributesPage")
     app.showFrame(page)
 
 
-def searchCardsByProperties():
-    cmc = app.getEntry("Search CMC")
-    colors = app.getEntry("Search Colors")
+def searchCardsByAttributes():
+    """
+    Search for cards based on multiple attributes and update the Create Deck Page.
+    """
+    # Collect values from the fields
+    filters = {
+        "name": app.getEntry("Name"),
+        "manacost": app.getEntry("Mana Cost"),
+        "cmc": app.getEntry("CMC"),
+        "colors": app.getEntry("Colors"),
+        "coloridentity": app.getEntry("Color Identity"),
+        "power": app.getEntry("Power"),
+        "toughness": app.getEntry("Toughness"),
+        "oracletext": app.getEntry("Oracle Text"),
+        "loyalty": app.getEntry("Loyalty"),
+        "typeline": app.getEntry("Type Line"),
+        "cardtype": app.getEntry("Card Type"),
+        "artist": app.getEntry("Artist"),
+    }
 
-    # Build the filters dictionary
-    filters = {}
-    if cmc:
-        filters["cmc"] = int(cmc)
-    if colors:
-        filters["colors"] = colors.lower()
+    # Remove empty filters
+    filters = {key: value for key, value in filters.items() if value}
+
+    # Modify the name filter to allow partial matches
+    if "name" in filters:
+        filters["name"] = f"%{filters['name']}%"  # Add wildcards for partial matching
 
     # Query the database
     matching_cards = DBQueries.queryCardsByProperties(filters)
 
-    # Update the SearchResultsList
+    # Update the SearchResultsList on the Create Deck Page
     app.clearListBox("SearchResultsList")
     for card in matching_cards:
-        app.addListItem(
-            "SearchResultsList",
-            f"{card['name']} (CMC: {card['cmc']}, Colors: {card['colors']})",
-        )
+        draft_deck.append(card)
+        app.addListItem("SearchResultsList", card.getName())
+
+    # Navigate back to the Create Deck Page
+    goToPage("CreateDeckPage")
 
 
 ### --------------------------------------------------------------------------------
@@ -539,9 +540,9 @@ app.addLabel("SearchLabel", "Search for a card:", row=2, column=0)
 app.addEntry("SearchField", row=3, column=0)  # Search field
 app.addButton("Search", lambda: searchCard(), row=3, column=1)  # Search button
 
-app.addLabelEntry("Search CMC")
-app.addLabelEntry("Search Colors")
-app.addButton("Search Cards", lambda: searchCardsByProperties())
+app.addButton(
+    "Search by properties", lambda: goToPage("SearchByAttributesPage"), row=5, column=0
+)
 
 app.startPanedFrame("SearchResults", row=4, column=0)
 app.addLabel("SearchResultsLabel", "Search Results")
@@ -561,5 +562,34 @@ app.stopPanedFrame()
 app.stopFrame()
 
 ### --------------------------------------------------------------------------------
+# Search By Attributes Page
+app.startFrame("SearchByAttributesPage", row=0, column=0)
+app.addLabel("page4Label", "Search by Card Attributes")
+
+# Add fields for card attributes
+app.addLabelEntry("Name")
+app.addLabelEntry("Mana Cost")
+app.addLabelEntry("CMC")
+app.addLabelEntry("Colors")
+app.addLabelEntry("Color Identity")
+app.addLabelEntry("Power")
+app.addLabelEntry("Toughness")
+app.addLabelEntry("Oracle Text")
+app.addLabelEntry("Loyalty")
+app.addLabelEntry("Type Line")
+app.addLabelEntry("Card Type")
+app.addLabelEntry("Artist")
+
+# Add a button to perform the search
+app.addButton("Search Attributes", lambda: searchCardsByAttributes())
+
+# Add a button to go back to the Welcome Page
+app.addButton("BackToWelcomeFromAttributes", lambda: goToPage("WelcomePage"))
+app.setButton("BackToWelcomeFromAttributes", "Back")
+
+app.stopFrame()
+
+### --------------------------------------------------------------------------------
 app.hideFrame("LoadDeckPage")  # Hide the LoadDeckPage by default
 app.hideFrame("CreateDeckPage")  # Hide the CreateDeckPage by default
+app.hideFrame("SearchByAttributesPage")  # Hide the SearchByAttributesPage by default
