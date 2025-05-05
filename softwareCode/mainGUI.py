@@ -15,6 +15,7 @@ regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
 regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
 saved_decks_path = "./Decks"  # Path to the folder containing saved decks
 draft_deck = []  # Placeholder for the draft deck
+searchResultList = []  # Placeholder for the search results list
 
 
 def press(btn):
@@ -251,18 +252,16 @@ def showCardImage(card_name, canvas):
 
 
 def updateSearchResultsList():
-    """
-    Update the SearchResultsList with the found card.
-
-    Args:
-        None
-    Returns:
-        None
-    """
-    selected_card = getSelectedItemFromListBox("SearchResultsList")
-    if selected_card:
-        app.addListItem("DraftDeckList", selected_card)
-        showCardImage(selected_card, "ImageCanvas")
+    """Update the search results list when a card is selected."""
+    selected_card_name = getSelectedItemFromListBox("SearchResultsList")
+    if selected_card_name:
+        matching_cards = DBQueries.get_card_from_db(selected_card_name)
+        if matching_cards:
+            mtg_card = matching_cards[0]
+            draft_deck.append(mtg_card)
+            app.addListItem("DraftDeckList", mtg_card.getName())
+            showCardImage(mtg_card.getName(), "ImageCanvas")
+            updateDeckStats()  # Update the deck stats
 
 
 def getSelectedItemFromDeck(clickedItem):
@@ -388,7 +387,7 @@ def searchCard():
     if matching_cards:
         # Add matching card names to the search results list box
         for card in matching_cards:
-            draft_deck.append(card)  # Add the card to the draft deck
+            searchResultList.append(card)  # Add the card to the draft deck
             app.addListItem("SearchResultsList", card.getName())
     else:
         app.addListItem("SearchResultsList", "No matches found.")
@@ -441,11 +440,25 @@ def searchCardsByAttributes():
     # Update the SearchResultsList on the Create Deck Page
     app.clearListBox("SearchResultsList")
     for card in matching_cards:
-        draft_deck.append(card)
+        searchResultList.append(card)
         app.addListItem("SearchResultsList", card.getName())
 
     # Navigate back to the Create Deck Page
     goToPage("CreateDeckPage")
+
+
+def updateDeckStats():
+    """
+    Update the deck statistics: total cards, land percentage, and total lands.
+    """
+    total_cards = len(draft_deck)
+    total_lands = sum(1 for card in draft_deck if "Land" in card.getCardType())
+    land_percentage = (total_lands / total_cards * 100) if total_cards > 0 else 0
+
+    # Update the labels
+    app.setLabel("CardsCount", str(total_cards))
+    app.setLabel("LandPercentage", f"{land_percentage:.1f}%")
+    app.setLabel("LandsCount", str(total_lands))
 
 
 ### --------------------------------------------------------------------------------
@@ -556,6 +569,16 @@ app.setListBoxChangeFunction("DraftDeckList", updateDraftDeckList)
 
 app.startPanedFrame("Canvas", row=4, column=0)
 app.addCanvas("ImageCanvas", row=4, column=0)  # Canvas for card image
+
+# Quick stats
+app.addLabel("CardsLabel", "Cards:", row=6, column=0)
+app.addLabel("CardsCount", "0", row=6, column=1)  # Placeholder for card count
+
+app.addLabel("LandPercentageLabel", "Land-%:", row=6, column=2)
+app.addLabel("LandPercentage", "0%", row=6, column=3)  # Placeholder for land percentage
+
+app.addLabel("LandsLabel", "Lands:", row=6, column=4)
+app.addLabel("LandsCount", "0", row=6, column=5)  # Placeholder for land count
 
 app.stopPanedFrame()
 app.stopPanedFrame()
