@@ -14,7 +14,7 @@ from .DBQueries import DBQueries
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
 regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
 saved_decks_path = "./Decks"  # Path to the folder containing saved decks
-draft_deck = []  # Placeholder for the draft deck
+currentDeck = []  # Placeholder for the current deck
 searchResultList = []  # Placeholder for the search results list
 
 
@@ -201,7 +201,7 @@ def showCardImage(card_name, canvas):
         None
     """
 
-    for i in draft_deck:
+    for i in currentDeck:
         if i.getName() == card_name:
             image_url = i.getImage()
             break
@@ -258,7 +258,7 @@ def updateSearchResultsList():
         matching_cards = DBQueries.get_card_from_db(selected_card_name)
         if matching_cards:
             mtg_card = matching_cards[0]
-            draft_deck.append(mtg_card)
+            currentDeck.append(mtg_card)
             app.addListItem("DraftDeckList", mtg_card.getName())
             showCardImage(mtg_card.getName(), "ImageCanvas")
             updateDeckStats()  # Update the deck stats
@@ -362,8 +362,9 @@ def populateSavedDecks():
 ## Save deck
 def saveCurrentDeck():
     """Save the current deck to a file."""
-    global currentDeck
+    print("Saving deck...")
     cond = None
+
     if currentDeck != cond:
         DBQueries.saveDeckToDB(currentDeck)
     populateSavedDecks()
@@ -451,8 +452,8 @@ def updateDeckStats():
     """
     Update the deck statistics: total cards, land percentage, and total lands.
     """
-    total_cards = len(draft_deck)
-    total_lands = sum(1 for card in draft_deck if "Land" in card.getCardType())
+    total_cards = len(currentDeck)
+    total_lands = sum(1 for card in currentDeck if "Land" in card.getCardType())
     land_percentage = (total_lands / total_cards * 100) if total_cards > 0 else 0
 
     # Update the labels
@@ -586,6 +587,9 @@ app.addLabel("LandsLabel", "Lands:", row=0, column=4)
 app.addLabel("LandsCount", "0", row=0, column=5)  # Placeholder for land count
 
 app.stopFrame()
+
+# Add a button to save the current draft deck
+app.addButton("Save Draft Deck", saveCurrentDeck, row=5, column=1)
 
 app.stopPanedFrame()
 app.stopPanedFrame()
