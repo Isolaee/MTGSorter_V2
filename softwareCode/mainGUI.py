@@ -9,12 +9,15 @@ import os
 from PIL import Image, ImageTk
 import sqlite3
 from .DBQueries import DBQueries
+from .EDHDeck import EDHDeck
+from .PioneerDeck import PioneerDeck
 
 
 regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
 regex_engine_type = re.compile(r"^(?P<CardType>\w+?)\s*(-|—|$)\s*(?P<CreatureType>.+)?")
 saved_decks_path = "./Decks"  # Path to the folder containing saved decks
-currentDeck = []  # Placeholder for the current deck
+currentDeck = None  # This should always be a deck object after this point
+draftDeckList = []  # Placeholder for the draft deck list
 searchResultList = []  # Placeholder for the search results list
 
 
@@ -26,7 +29,6 @@ def press(btn):
         btn (str): The button that was pressed.
     """
     global currentDeck
-
     if btn == "Load":
         # Get the file path from the file entry widget
         file_path = app.getEntry("DeckUpload")
@@ -161,11 +163,11 @@ def loadDeckByClick(clickedDeck):
     Args:
         clickedDeck (str): The name of the clicked deck.
     """
+    global currentDeck
     selected_deck = app.getListBox(clickedDeck)
     if selected_deck:
         file_path = selected_deck[0]  # Construct the full file path
         try:
-            global currentDeck
             currentDeck = DBQueries.loadDeckFromDB(file_path)
             # Update the DeckPreview list box
             app.clearListBox("DeckPreview", callFunction=False)
@@ -201,7 +203,7 @@ def showCardImage(card_name, canvas):
         None
     """
 
-    for i in currentDeck:
+    for i in currentDeck.getCards():
         if i.getName() == card_name:
             image_url = i.getImage()
             break
@@ -258,7 +260,7 @@ def updateSearchResultsList():
         matching_cards = DBQueries.get_card_from_db(selected_card_name)
         if matching_cards:
             mtg_card = matching_cards[0]
-            currentDeck.append(mtg_card)
+            draftDeckList.append(mtg_card)
             app.addListItem("DraftDeckList", mtg_card.getName())
             showCardImage(mtg_card.getName(), "ImageCanvas")
             updateDeckStats()  # Update the deck stats
@@ -362,12 +364,42 @@ def populateSavedDecks():
 ## Save deck
 def saveCurrentDeck():
     """Save the current deck to a file."""
-    print("Saving deck...")
     cond = None
 
     if currentDeck != cond:
         DBQueries.saveDeckToDB(currentDeck)
     populateSavedDecks()
+
+
+def saveCurrentDeckCreateDeck():
+    """Save the current draft deck to a file."""
+    global currentDeck
+
+    format = app.getOptionBox("Select Format")
+    # commander = app.getEntry("Commander Name")  # Get the commander name from the entry field
+    commander = "Tajic, Blade of the Legion"  # Placeholder for the commander name
+    deck_name = "My Draft Deck"  # Placeholder for the deck name
+    commanderCard = DBQueries.get_card_from_db(commander)
+
+    if format == "Commander":
+        currentDeck = EDHDeck(
+            name=deck_name,
+            format="commander",
+            cards=draftDeckList,
+            commander=commanderCard[0],
+        )
+    elif format == "Pioneer":
+        currentDeck = PioneerDeck(
+            name=deck_name,
+            format="pioneer",
+            cards=draftDeckList,
+        )
+    else:
+        print("Invalid format selected. Please choose either Commander or Pioneer.")
+        return  # Exit the function if the format is invalid
+
+    saveCurrentDeck()
+    populateSavedDecks()  # Refresh the saved decks list after saving
 
 
 def searchCard():
@@ -452,8 +484,8 @@ def updateDeckStats():
     """
     Update the deck statistics: total cards, land percentage, and total lands.
     """
-    total_cards = len(currentDeck)
-    total_lands = sum(1 for card in currentDeck if "Land" in card.getCardType())
+    total_cards = len(draftDeckList)
+    total_lands = sum(1 for card in draftDeckList if "Land" in card.getCardType())
     land_percentage = (total_lands / total_cards * 100) if total_cards > 0 else 0
 
     # Update the labels
@@ -589,7 +621,7 @@ app.addLabel("LandsCount", "0", row=0, column=5)  # Placeholder for land count
 app.stopFrame()
 
 # Add a button to save the current draft deck
-app.addButton("Save Draft Deck", saveCurrentDeck, row=5, column=1)
+app.addButton("Save Draft Deck", saveCurrentDeckCreateDeck, row=5, column=1)
 
 # Add format selection to the Create Deck Page
 app.addLabel("FormatLabelCraeteDeck", "Select Deck Format:", row=2, column=0)

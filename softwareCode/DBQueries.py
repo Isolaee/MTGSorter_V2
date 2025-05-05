@@ -146,6 +146,9 @@ class DBQueries:
         format = deck.getFormat()
         cards_json = json.dumps([card.to_dict() for card in deck.cards])
 
+        if not deck.enforceFormatRules():
+            return
+
         if format == "commander":
             # Create the table if it doesn't exist
             cursor.execute(
@@ -159,10 +162,10 @@ class DBQueries:
                 )
                 """
             )
-
+            print(deck.getAllCardNames())
             # Serialize the commander and cards as JSON
             commander_json = (
-                json.dumps(deck.commander.to_dict()) if deck.commander else None
+                json.dumps(deck.getCommander().to_dict()) if deck.getCommander() else None
             )
 
             # Insert the deck into the database

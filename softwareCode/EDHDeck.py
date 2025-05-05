@@ -48,7 +48,7 @@ class EDHDeck(MTGDeck):
 
     def getCommander(self) -> MTGCard:
         """Return the commander of the deck."""
-        return self.commander.toString()  # This toString() might of might not work.
+        return self.commander
 
     def getScryfallStatic(self) -> str:
         """Return the Scryfall static URL."""
