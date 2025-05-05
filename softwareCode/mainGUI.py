@@ -535,10 +535,11 @@ app.setButton("BackToWelcomeFromCreateDeck", "Back")
 app.addLabel("FormatLabel", "Select Deck Format:", row=2, column=0)
 app.addLabelOptionBox("Select Format", ["Commander", "Pioneer"], row=3, column=0)
 
-
+app.startFrame("SearchContainer", row=3, column=0)
 app.addLabel("SearchLabel", "Search for a card:", row=2, column=0)
 app.addEntry("SearchField", row=3, column=0)  # Search field
 app.addButton("Search", lambda: searchCard(), row=3, column=1)  # Search button
+app.stopFrame()
 
 app.addButton(
     "Search by properties", lambda: goToPage("SearchByAttributesPage"), row=5, column=0
