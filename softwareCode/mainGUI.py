@@ -570,15 +570,22 @@ app.setListBoxChangeFunction("DraftDeckList", updateDraftDeckList)
 app.startPanedFrame("Canvas", row=4, column=0)
 app.addCanvas("ImageCanvas", row=4, column=0)  # Canvas for card image
 
-# Quick stats
-app.addLabel("CardsLabel", "Cards:", row=6, column=0)
-app.addLabel("CardsCount", "0", row=6, column=1)  # Placeholder for card count
+# Create a frame for the stats and align it to the bottom
+app.startFrame("StatsContainer", row=6, column=0, colspan=6)
+app.setSticky("s")  # Stick the frame to the bottom
+app.setStretch("both")  # Allow the frame to stretch
 
-app.addLabel("LandPercentageLabel", "Land-%:", row=6, column=2)
-app.addLabel("LandPercentage", "0%", row=6, column=3)  # Placeholder for land percentage
+# Add fields inside the frame
+app.addLabel("CardsLabel", "Cards:", row=0, column=0)
+app.addLabel("CardsCount", "0", row=0, column=1)  # Placeholder for card count
 
-app.addLabel("LandsLabel", "Lands:", row=6, column=4)
-app.addLabel("LandsCount", "0", row=6, column=5)  # Placeholder for land count
+app.addLabel("LandPercentageLabel", "Land-%:", row=0, column=2)
+app.addLabel("LandPercentage", "0%", row=0, column=3)  # Placeholder for land percentage
+
+app.addLabel("LandsLabel", "Lands:", row=0, column=4)
+app.addLabel("LandsCount", "0", row=0, column=5)  # Placeholder for land count
+
+app.stopFrame()
 
 app.stopPanedFrame()
 app.stopPanedFrame()
