@@ -105,3 +105,16 @@ I will:
 I think the root cause of these recent problems is a lack of "vision". Taking time to review my code and trying to improve it, instead of making new code, will make for a better development experience.  
 On a small side note, I think I should not only think about what my methods return, but also what I want them to return and why. I need to make myself clear on what is the main data I am handling.
 </details>
+
+<details>
+<summary>06/05</summary>
+
+# Software
+After some pondering, I have decided that every piece of data related to the "game" in the software will be represented as `MTGCard` or `MTGDeck` objects (or other TCG objects in the future). This approach allows me to build data analysis directly on "decks" and unify the way I display names and other information.
+
+# MainGUI
+I have decided to separate the `MainGUI` GUI elements and the `MainGUI` logic into separate files. This will give me better flexibility and easier access when modifying the visuals.
+
+# TODO
+Since the software and `MainGUI` logic are currently intertwined, I will start by separating the `MainGUI` logic and rebuilding the methods in a new file (`MainGUILogic.py`). When using methods, `MainGUI` will call `MainGUILogic.method()` or pass the method name as required by AppJar.
+</details>
