@@ -262,7 +262,6 @@ def updateSearchResultsList():
     if card:
         draftDeckList.append(card)
         app.addListItem("DraftDeckList", card.getName())
-        showCardImage(card.getName(), "ImageCanvas")
         updateDeckStats()  # Update the deck stats
 
 
