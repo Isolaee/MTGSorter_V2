@@ -162,7 +162,6 @@ class DBQueries:
                 )
                 """
             )
-            print(deck.getAllCardNames())
             # Serialize the commander and cards as JSON
             commander_json = (
                 json.dumps(deck.getCommander().to_dict()) if deck.getCommander() else None
