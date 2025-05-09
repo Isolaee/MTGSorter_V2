@@ -135,12 +135,8 @@ class MainLogic:
     def updateGraphCanvas(self, data, canvasName):
         """
         Update the GraphCanvas with a graph based on the provided data.
-
-        Args:
-            data (dict): A dictionary containing the data for the graph.
         """
-        canvas = self.app.getCanvas(canvasName)
-        canvas.delete("all")  # Clear the canvas before adding a new graph
+        frame = self.app.getFrame(canvasName)
 
         # Destroy the previous FigureCanvasTkAgg widget if it exists
         if hasattr(self, "graph_canvas_widget") and self.graph_canvas_widget is not None:
@@ -149,77 +145,48 @@ class MainLogic:
 
         # Create a Matplotlib figure
         fig, ax = plt.subplots(figsize=(5, 4))
-
-        # Plot the data
         ax.bar(data.keys(), data.values(), color="skyblue")
         ax.set_title("Card Data")
         ax.set_xlabel("Categories")
         ax.set_ylabel("Counts")
-
-        # Ensure Y-axis ticks are whole numbers
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
-        # Embed the figure into the AppJar canvas
-        self.graph_canvas_widget = FigureCanvasTkAgg(fig, canvas)
+        # Embed the figure into the AppJar frame
+        self.graph_canvas_widget = FigureCanvasTkAgg(fig, frame)
         self.graph_canvas_widget.draw()
-        self.graph_canvas_widget.get_tk_widget().pack()
+        self.graph_canvas_widget.get_tk_widget().pack(fill="both", expand=True)
 
-    def showCardImage(self, card, canvas):
+    def showCardImage(self, card, canvasName):
         """
         Show the image of the selected card to Selected Canvas.
-
-        Args:
-            card_name (str): The name of the card.
-            canvas (tkinter.Canvas): The canvas to display the image on.
-        Returns:
-            None
         """
-
-        canvas.delete("all")  # Clear the canvas before adding a new image
+        canvas = self.app.getCanvas(canvasName)
+        canvas.delete("all")
 
         image_url = card.getImage()
-
         response = requests.get(image_url)
-
         if response.status_code == 200:
-            # Construct the path to the TempImg folder inside softwareCode
             temp_img_dir = os.path.join(os.path.dirname(__file__), "TempImg")
-            os.makedirs(
-                temp_img_dir, exist_ok=True
-            )  # Create the folder if it doesn't exist
-
-            # Save the image as a temporary .JPG file
+            os.makedirs(temp_img_dir, exist_ok=True)
             jpg_image_path = os.path.join(temp_img_dir, "selected_card.jpg")
             with open(jpg_image_path, "wb") as file:
                 file.write(response.content)
 
-            # Get the tkinter Canvas object from appJar
-            canvas = self.app.getCanvas("ImageCanvas")
-
-            # Get the canvas size
-            canvas.update_idletasks()  # Ensure the canvas size is updated
+            canvas.update_idletasks()
             canvas_width = canvas.winfo_width()
             canvas_height = canvas.winfo_height()
 
-            # Convert the .JPG image to a format compatible with tkinter
             with Image.open(jpg_image_path) as img:
-                # Calculate the new width to maintain the aspect ratio
                 aspect_ratio = img.width / img.height
                 new_height = canvas_height
                 new_width = int(new_height * aspect_ratio)
-
-                # Resize the image
                 img = img.resize((new_width, new_height))
                 tk_image = ImageTk.PhotoImage(img)
 
-            # Clear the canvas before adding a new image
-            canvas.delete("all")
-
-            # Add the image to the canvas, centered
             canvas.create_image(
                 canvas_width // 2, canvas_height // 2, image=tk_image, anchor="center"
             )
-            canvas.image = tk_image  # Keep a reference to avoid garbage collection
+            canvas.image = tk_image
         else:
             print(
                 f"Failed to retrieve image from {image_url}. Status code: {response.status_code}"
