@@ -16,6 +16,7 @@ import re
 class MainLogic:
     def __init__(self, app_instance):
         self.app = app_instance
+        self.graph_canvas_widget = None
 
     # Regex patterns for parsing card names and types
     regex_engine_card = re.compile(r"(?P<amount>\d+)x?,?\s+(?P<name>.+)")
@@ -105,14 +106,14 @@ class MainLogic:
             pass  # Implement type search functionality here
         elif item == "Mana Curve":
             data = self.current_deck.getHistogramData("CMC")
-            self.updateGraphCanvas(data)
+            self.updateGraphCanvas(data, "GraphCanvas")
         elif item == "Permanents":
             pass  # Implement permanents functionality here
         elif item == "Spells":
             pass  # Implement spells functionality here
         elif item == "Card Distribution":
             data = self.current_deck.getHistogramData("CardType")
-            self.updateGraphCanvas(data)
+            self.updateGraphCanvas(data, "GraphCanvas")
 
     def goToPage(self, page):
         """Switch to the specified page."""
@@ -131,18 +132,20 @@ class MainLogic:
             self.app.addListItem("DeckPreview", f"{amount}x {card_name}")
 
     # Update the GraphCanvas with a graph based on the provided data
-    def updateGraphCanvas(self, data):
+    def updateGraphCanvas(self, data, canvasName):
         """
         Update the GraphCanvas with a graph based on the provided data.
 
         Args:
             data (dict): A dictionary containing the data for the graph.
         """
-        # Get the tkinter Canvas object from appJar
-        canvas = self.app.getCanvas("GraphCanvas")
+        canvas = self.app.getCanvas(canvasName)
+        canvas.delete("all")  # Clear the canvas before adding a new graph
 
-        # Clear the canvas before adding a new graph
-        canvas.delete("all")
+        # Destroy the previous FigureCanvasTkAgg widget if it exists
+        if hasattr(self, "graph_canvas_widget") and self.graph_canvas_widget is not None:
+            self.graph_canvas_widget.get_tk_widget().destroy()
+            self.graph_canvas_widget = None
 
         # Create a Matplotlib figure
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -157,9 +160,9 @@ class MainLogic:
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
         # Embed the figure into the AppJar canvas
-        canvas_widget = FigureCanvasTkAgg(fig, canvas)
-        canvas_widget.draw()
-        canvas_widget.get_tk_widget().pack()
+        self.graph_canvas_widget = FigureCanvasTkAgg(fig, canvas)
+        self.graph_canvas_widget.draw()
+        self.graph_canvas_widget.get_tk_widget().pack()
 
     def showCardImage(self, card, canvas):
         """
@@ -171,6 +174,8 @@ class MainLogic:
         Returns:
             None
         """
+
+        canvas.delete("all")  # Clear the canvas before adding a new image
 
         image_url = card.getImage()
 

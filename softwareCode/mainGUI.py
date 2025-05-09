@@ -30,6 +30,7 @@ app.addButton(
 )
 app.stopFrame()
 
+
 ### --------------------------------------------------------------------------------
 # Load Deck Page
 app.startFrame("LoadDeckPage", row=0, column=0)
@@ -45,6 +46,10 @@ app.setButton("BackToWelcomeFromLoadDeck", "Back")
 # Menu
 fileMenus = ["Close", "Help", "About"]
 app.addMenuList("Menu", fileMenus, MainGUIClassElement.menuControls)
+
+# # DataMenu
+dataMenu = ["Mana Curve", "Card Distribution"]
+app.addMenuList("Data", dataMenu, MainGUIClassElement.dataMenuControls)
 
 # Add widgets for format selection
 formats = ["Commander", "Pioneer"]
@@ -71,9 +76,7 @@ app.setListBoxChangeFunction("DeckPreview", MainGUIClassElement.getSelectedItemF
 app.startPanedFrame("Graphs")
 # Graphs
 app.addCanvas("GraphCanvas")
-# # DataMenu
-dataMenu = ["Mana Curve", "Card Distribution"]
-app.addMenuList("Data", dataMenu, MainGUIClassElement.dataMenuControls)
+
 
 app.stopPanedFrame()
 app.stopPanedFrame()
