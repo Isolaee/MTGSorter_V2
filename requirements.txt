@@ -13,3 +13,4 @@
 # gensim
 # nltk
 # Word2Vec
+# SQLite3
