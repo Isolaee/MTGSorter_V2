@@ -47,7 +47,6 @@ class DBQueries:
             # Execute the query
             cursor.execute(query, values)
             rows = cursor.fetchall()
-
             if rows:
                 return [
                     MTGCard(

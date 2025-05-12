@@ -377,7 +377,7 @@ class MainLogic:
         # Update the SearchResultsList on the Create Deck Page
         self.app.clearListBox("SearchResultsList")
         for card in matching_cards:
-            self.searchResultList.append(card)
+            self.searchResultsLists.append(card)
             self.app.addListItem("SearchResultsList", card.getName())
 
         # Navigate back to the Create Deck Page
@@ -405,7 +405,7 @@ class MainLogic:
         if matching_cards:
             # Add matching card names to the search results list box
             for card in matching_cards:
-                self.searchResultList.append(card)  # Add the card to the draft deck
+                self.searchResultsLists.append(card)  # Add the card to the draft deck
                 self.app.addListItem("SearchResultsList", card.getName())
         else:
             self.app.addListItem("SearchResultsList", "No matches found.")
