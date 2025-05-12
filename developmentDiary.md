@@ -118,3 +118,17 @@ I have decided to separate the `MainGUI` GUI elements and the `MainGUI` logic in
 # TODO
 Since the software and `MainGUI` logic are currently intertwined, I will start by separating the `MainGUI` logic and rebuilding the methods in a new file (`MainGUILogic.py`). When using methods, `MainGUI` will call `MainGUILogic.method()` or pass the method name as required by AppJar.
 </details>
+
+<details>
+<summary>12/05 V3 Future</summary>
+After some work simplifying the software and pondering over this design, I have decided to create version 3.  
+I showed this project to my teacher and got 5 ECTS with grade 5, but I am not happy with it. As a dream, I would like to use this as a stepping stone to industry or even sell this service.  
+For that, I need a good interface/UI, and AppJar cannot provide that.  
+For Version 3, I am going to build a web-based, three-layered app: Website - Server - Database. I am going to use a microservices structure with REST. The website will be done with HTML, CSS, and TypeScript. The server will hopefully remain Python.  
+On top of that, I will change my development to test-driven development. Tests are the aspect of V2 that I failed.  
+I am going to use a much stricter system for new features. I will write down what I need, plan it, choose completion criteria, and only then do it. "Kanban style."
+
+See you in version 3.
+</details>
+
+Eero Isola
